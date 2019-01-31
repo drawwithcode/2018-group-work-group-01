@@ -36,9 +36,10 @@ function setup() {
   }
 }
 //Lati verticali del box principale, parametrici, e padding in alto e basso.
-let mainLSide = 200;
-let mainRSide = 900;
+let meterWidth=25;
 const padding = 40;
+let mainLSide = meterWidth+padding+padding*.75;
+let mainRSide = 900;
 
 //Variabili per il noise che uso per variare certe trasformazioni.
 var hNoise, vNoise;
@@ -67,17 +68,29 @@ let gravity = 0.02;
 let splashState = 0;
 let splashAmount = 0;
 
+let now=then=0;
+
 function draw() {
-  //vOffset è la profondità, influenzata da gravity.
-  vOffset = vOffset + speed;
-  speed = speed - gravity;
-  //In risposta a evento, viene data spinta verso l'alto.
-  //Questa parte è provvisoria. L'evento è sbagliato e la spinta non deve essere costante.
+  //Velocità calcolata SUL TEMPO, non su framerate.
+  function calcSpeed(DELTA,SPEED) {
+    return (SPEED*DELTA)*0.06;
+  }
+  now = millis();
+  delta = now - then;
+  vOffset += calcSpeed(delta,speed);
+  speed += calcSpeed(delta,-gravity);
   if (keyIsPressed && speed < 0) {
     speed = 0.5;
   } else if (keyIsPressed) {
-    speed += 0.5;
+    speed += calcSpeed(delta,0.5);
   }
+  then=now;
+  //vOffset = vOffset + speed;
+  //speed = speed - gravity;
+
+  //In risposta a evento, viene data spinta verso l'alto.
+  //Questa parte è provvisoria. L'evento è sbagliato e la spinta non deve essere costante.
+
   //mapVar a seconda della profondità.
   if (vOffset < -2000 && mapVar <= 2) {
     mapVar = lerp(mapVar, 2, 0.01);
@@ -86,7 +99,7 @@ function draw() {
     mapVar = lerp(mapVar, 0, 0.01);
   }
   //Movimento dell'avatar. Noise+oscillazione verticale.
-  avatarOff = lerp(avatarOff, speed * 10, 0.05) + cos(frameCount / 30);
+  avatarOff = lerp(avatarOff, speed * 10, 0.05) + cos(millis()*0.06 / 30);
   noiseSpeed = 0.2;
   noiseAmount = mapVar * 30;
   noiseSeed(9);
@@ -112,11 +125,7 @@ function draw() {
 
   //posizione dell'avatar
   center = createVector(mainLSide + (mainRSide - mainLSide) / 2, height / 2 + avatarOff);
-  if (center.y <= padding * 2) {
-    center.y = padding * 2;
-  } else if (center.y >= height - padding * 2) {
-    center.y = height - padding * 2;
-  }
+  center.y = limitValue(center.y, padding*3, height-padding*3);
 
 
   //***MARE-CIELO***
@@ -195,15 +204,18 @@ function draw() {
   stroke(255);
   blendMode(DIFFERENCE);
   push();
+  fill(255);
+  noStroke();
   translate(hNoise, vNoise);
-  bezier(center.x + vNoise / 2, center.y + 30 + hNoise / 2,
-    center.x - 50, center.y + hNoise / 2,
-    center.x - 15 + vNoise / 2, center.y - 37.5,
-    center.x, center.y - 7.5);
-  bezier(center.x + vNoise / 2, center.y + 30 + hNoise / 2,
-    center.x + 50 + vNoise / 2, center.y,
-    center.x + 15, center.y - 37.5 + hNoise / 2,
-    center.x, center.y - 7.5);
+  beginShape();
+  vertex(center.x + vNoise / 2, center.y + 30 + hNoise / 2);
+  bezierVertex( center.x - 50, center.y + hNoise / 2,
+                center.x - 15 + vNoise / 2, center.y - 37.5,
+                center.x, center.y - 7.5);
+  bezierVertex( center.x + 15, center.y - 37.5 + hNoise / 2,
+                center.x + 50, center.y + hNoise / 2,
+                center.x + vNoise / 2, center.y + 30 + hNoise / 2);
+  endShape();
   pop();
 
   //Righello
@@ -229,7 +241,7 @@ function draw() {
     }
     //linee cinetiche (una per ogni tacca del righello)
     if (vPos < height && vPos > 0) {
-      let linePos = map(randomPos[i - topValue], 0, 1, mainLSide + 10, mainRSide - 100) + cos(frameCount / 100 + randomPos[i - topValue] * 360) * 5;
+      let linePos = map(randomPos[i - topValue], 0, 1, mainLSide + 10, mainRSide - 100) + cos(millis()*0.06 / 100 + randomPos[i - topValue] * 360) * 5;
       let topPos = vPos - 3 * speed - random(0, 2);
       let bottomPos = vPos + 3 * speed + random(0, 2);
       topPos = cullPoint(topPos);
@@ -238,10 +250,27 @@ function draw() {
     }
 
   }
+  //***DEPTH METER***//
 
 
-  //POST-PROCESSING
-  blendMode(BLEND)
+
+  let meterAvatarHeight=map(vOffset,40000,-40000,padding*1.2,height-padding*1.2);
+  meterAvatarHeight=limitValue(meterAvatarHeight,padding*1.2,height-padding*1.2);
+  /*if (meterAvatarHeight<=padding*1.2) {
+    meterAvatarHeight=padding*1.2;
+  } else if (meterAvatarHeight>=height-padding*1.2) {
+    meterAvatarHeight=height-padding*1.2;
+  }*/
+  push(); noStroke(); fill(255);
+  ellipse(padding+meterWidth/2,meterAvatarHeight,10);
+  blendMode(DIFFERENCE);
+  rect(padding,height/2,meterWidth,height/2-padding);
+  pop();
+  blendMode(BLEND);
+  stroke(255-bgBrightness);
+  rect(padding,padding,meterWidth,height-padding*2);
+
+  //***POST-PROCESSING***//
   if (vOffset > -100) {
     postPro = false;
   } else {
@@ -250,14 +279,14 @@ function draw() {
   if (postPro) {
     push();
     var snapShot = get();
-    let n = noise(millis() / 100 * 0.1) * mapVar;
-    let scaleAm = 1 + n / 80;
+    let n = noise(millis() / 30 * 0.1) * mapVar;
+    let scaleAm = 1 + n / 160;
     let satVar = (millis() / 100) % 510;
     if (satVar > 255) {
       satVar = 500 - satVar;
     }
     colorMode(HSB);
-    fill(255, 255, 200, map(mouseX, 0, width, 0, 1));
+    fill(255, 255, 200, 40);
     blendMode(MULTIPLY);
     rect(0, 0, width, height);
     blendMode(SCREEN);
@@ -267,13 +296,23 @@ function draw() {
     translate(-width / 2, -height / 2);
     scale(scaleAm)
     translate(-width * (sqrt(scaleAm) - 1), -height * (sqrt(scaleAm) - 1));
-    image(snapShot, 0, 0);
+    image(snapShot, n, n);
     pop();
 
     fill(satVar, 100, 255, map(mapVar, 0, 2, 0, 1));
     blendMode(MULTIPLY);
     rect(0, 0, width, height);
     pop();
+  }
+}
+
+function limitValue(VALUE,MIN,MAX) {
+  if (VALUE<=MIN) {
+    return VALUE=MIN;
+  } else if (VALUE>=MAX) {
+    return VALUE=MAX;
+  } else {
+    return VALUE;
   }
 }
 
@@ -331,4 +370,8 @@ function cullPoint(INPUT) {
   } else {
     return INPUT;
   }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth,windowHeight);
 }
