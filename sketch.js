@@ -1,5 +1,12 @@
 //Il codice è un po' un casino.
-function preload() {}
+function preload() {
+  splash1 = loadSound("./sounds/splash1.mp3");
+  splash3 = loadSound("./sounds/splash3.mp3");
+  horror = loadSound("./sounds/horror.wav");
+  horror3 = loadSound("./sounds/horror3.mp3");
+  heartbeat = loadSound("./sounds/heartbeat.mp3");
+  impact = loadSound("./sounds/impact.mp3");
+}
 let randomPos = [];
 
 //massima altitudine e massima profondità (segno invertito).
@@ -58,6 +65,8 @@ let bgBrightness = 0;
 let vOffset = 0;
 //movimento dell'avatar (cuore). L'avatar in realtà resta fermo, mentre il resto del mondo si muove.
 let avatarOff = 0;
+let avatarScale = 1;
+let avatarFill = 255;
 let center;
 //velocità del mondo e gravità.
 let speed = 0;
@@ -67,6 +76,7 @@ let gravity = 0.02;
 //0: not splashing. 1: splash up. 2: splash down.
 let splashState = 0;
 let splashAmount = 0;
+let allowSound = 1;
 
 let now=then=0;
 
@@ -80,9 +90,18 @@ function draw() {
   vOffset += calcSpeed(delta,speed);
   speed += calcSpeed(delta,-gravity);
   if (keyIsPressed && speed < 0) {
+    avatarScale = lerp(avatarScale,1.3,0.1);
+    avatarFill = lerp(avatarFill,50,0.5);
+    impact.play();
     speed = 0.5;
   } else if (keyIsPressed) {
+    avatarScale = lerp(avatarScale,1.3,0.1);
+    avatarFill = lerp(avatarFill,50,0.5);
+    impact.play();
     speed += calcSpeed(delta,0.5);
+  } else {
+    avatarScale = lerp(avatarScale,1,0.05);
+    avatarFill = lerp(avatarFill,255,0.05);
   }
   then=now;
   //vOffset = vOffset + speed;
@@ -163,6 +182,19 @@ function draw() {
   let splashing = 0;
   if (vOffset < 10 && vOffset > -10) {
     splashing = 1;
+    if(allowSound) {
+      if(speed>0) {
+        splash1.rate(2);
+        splash3.rate(1);
+      } else {
+        splash1.rate(1);
+        splash3.rate(0.8);
+      }
+      splash1.play();
+      splash3.play();
+      allowSound=0;
+      setTimeout(function(){allowSound=1},1000);
+    }
   }
   if (splashing && splashState == 0 || splashing && splashState == 2) {
     splashState = 1;
@@ -204,17 +236,18 @@ function draw() {
   stroke(255);
   blendMode(DIFFERENCE);
   push();
-  fill(255);
+  fill(avatarFill);
   noStroke();
   translate(hNoise, vNoise);
+  //scale(*avatarScale);
   beginShape();
-  vertex(center.x + vNoise / 2, center.y + 30 + hNoise / 2);
-  bezierVertex( center.x - 50, center.y + hNoise / 2,
-                center.x - 15 + vNoise / 2, center.y - 37.5,
-                center.x, center.y - 7.5);
-  bezierVertex( center.x + 15, center.y - 37.5 + hNoise / 2,
-                center.x + 50, center.y + hNoise / 2,
-                center.x + vNoise / 2, center.y + 30 + hNoise / 2);
+  vertex(center.x + vNoise / 2*avatarScale, center.y + 30*avatarScale + hNoise / 2*avatarScale);
+  bezierVertex( center.x - 50*avatarScale, center.y + hNoise / 2*avatarScale,
+                center.x - 15 + vNoise / 2*avatarScale, center.y - 37.5*avatarScale,
+                center.x, center.y - 7.5*avatarScale);
+  bezierVertex( center.x + 15*avatarScale, center.y - 37.5*avatarScale + hNoise / 2*avatarScale,
+                center.x + 50*avatarScale, center.y + hNoise / 2*avatarScale,
+                center.x + vNoise / 2*avatarScale, center.y + 30*avatarScale + hNoise / 2*avatarScale);
   endShape();
   pop();
 
@@ -266,9 +299,26 @@ function draw() {
   blendMode(DIFFERENCE);
   rect(padding,height/2,meterWidth,height/2-padding);
   pop();
+  bottomFail = new failArea(padding,padding,meterWidth,(height-padding*2)/6);
+  bottomFail = new failArea(padding,height-padding-(height-padding*2)/6,meterWidth,(height-padding*2)/6);
   blendMode(BLEND);
   stroke(255-bgBrightness);
   rect(padding,padding,meterWidth,height-padding*2);
+
+  //***AMBIENT SOUNDS***//
+  let hAmp;
+  if (horror3.isPlaying()==false&&vOffset<0) {
+    horror3.loop();
+  }
+  if (heartbeat.isPlaying()==false&&vOffset<-2000) {
+    heartbeat.loop();
+  } else if (vOffset>-1000) {
+
+    heartbeat.amp(1);
+  }
+  if (horror.isPlaying()==false&&vOffset<-4000) {
+    horror.loop();
+  }
 
   //***POST-PROCESSING***//
   if (vOffset > -100) {
@@ -314,6 +364,21 @@ function limitValue(VALUE,MIN,MAX) {
   } else {
     return VALUE;
   }
+}
+
+function failArea(X,Y,WIDTH,HEIGHT) {
+  HEIGHT = HEIGHT-2;
+  Y = Y+1;
+  for (i=-WIDTH;i<HEIGHT;i+=7) {
+    if (i<0) {
+      line(X+WIDTH,Y-i,X+i+WIDTH,Y);
+    } else if(Y+WIDTH+i+4>Y+HEIGHT&&HEIGHT-i-4>0) {
+      line(X,Y+i+4,X+HEIGHT-i-4,Y+HEIGHT);
+    } else if (HEIGHT-i-4>0) {
+      line(X,Y+i+4,X+WIDTH,Y+WIDTH+i+4);
+    }
+  }
+  rect(X,Y-1,WIDTH,HEIGHT+2);
 }
 
 function Splash(WIDTH, HEIGHT, OFFSET) {
