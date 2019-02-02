@@ -2,11 +2,15 @@
 function preload() {
   splash1 = loadSound("./sounds/splash1.mp3");
   splash3 = loadSound("./sounds/splash3.mp3");
-  horror = loadSound("./sounds/horror.wav");
+  horror = loadSound("./sounds/horror.mp3");
   horror3 = loadSound("./sounds/horror3.mp3");
   heartbeat = loadSound("./sounds/heartbeat.mp3");
   impact = loadSound("./sounds/impact.mp3");
+  wind = loadSound("./sounds/wind.mp3");
+  strings2 = loadSound("./sounds/strings2.mp3");
 }
+let hbAmp=hAmp=h3Amp=windAmp=str2Amp=0;
+
 let randomPos = [];
 
 //massima altitudine e massima profondità (segno invertito).
@@ -306,19 +310,53 @@ function draw() {
   rect(padding,padding,meterWidth,height-padding*2);
 
   //***AMBIENT SOUNDS***//
-  let hAmp;
   if (horror3.isPlaying()==false&&vOffset<0) {
     horror3.loop();
   }
-  if (heartbeat.isPlaying()==false&&vOffset<-2000) {
-    heartbeat.loop();
-  } else if (vOffset>-1000) {
-
-    heartbeat.amp(1);
+  if (vOffset<-100) {
+    h3Amp=lerp(h3Amp,1,0.1);
+  } else {
+    h3Amp=lerp(h3Amp,0,0.01);
   }
   if (horror.isPlaying()==false&&vOffset<-4000) {
     horror.loop();
   }
+  if (vOffset<-4000) {
+    hAmp=lerp(hAmp,1,0.1);
+  } else {
+    hAmp=lerp(hAmp,0,0.01);
+  }
+  if (heartbeat.isPlaying()==false&&vOffset<-2000) {
+    heartbeat.loop();
+  }
+  if (vOffset<-2000) {
+    hbAmp=lerp(hbAmp,1,0.5);
+  } else if (vOffset>-1000) {
+    hbAmp=lerp(hbAmp,0,0.1);
+  }
+
+  if (wind.isPlaying()==false&&vOffset>-100) {
+    wind.loop();
+  }
+  if (vOffset>-100) {
+    windAmp=lerp(windAmp,0.5,0.1);
+  } else {
+    windAmp=lerp(windAmp,0,0.01);
+  }
+  if (strings2.isPlaying()==false&&vOffset>2000) {
+    strings2.loop();
+  }
+  if (vOffset>2000) {
+    str2Amp=lerp(str2Amp,1,0.1);
+  } else {
+    str2Amp=lerp(str2Amp,0,0.01);
+  }
+  horror.amp(hAmp);
+  horror3.amp(h3Amp);
+  heartbeat.amp(hbAmp);
+
+  wind.amp(windAmp);
+  strings2.amp(str2Amp);
 
   //***POST-PROCESSING***//
   if (vOffset > -100) {
@@ -434,6 +472,12 @@ function cullPoint(INPUT) {
     return height - padding;
   } else {
     return INPUT;
+  }
+}
+
+function keyReleased() {
+  if (keyCode === 32) {
+    spaceReleased=1;
   }
 }
 
