@@ -99,59 +99,6 @@ let now=then=0;
 let kalSize, offScreen;
 let kalAlpha = 0;
 
-function calcStuff(width, height, s) {
-  // because pythagorean theorem
-  // h = sqrt(a^2 + b^2)
-  // a = sqrt(h^2 - b^2)
-  // b = sqrt(h^2 - a^2)
-  let a = sqrt(sq(width/2)+sq(height/2));
-  let theta = radians(360 / s);
-  let o = tan(theta) * a;
-  let h = a / cos(theta);
-
-  return {a: round(a), o: round(o), h: round(h)};
-}
-function createMask(w,h) {
-    // create triangular mask so that the parts of the
-    // kaleidoscope don't draw over one another
-
-    mask = createImage(w,h);
-    mask.loadPixels();
-    for (i = 0; i < mask.width; i++) {
-        for (j = 0; j < mask.height; j++) {
-            if(i >= map(j,0,h,0,w)-1) // -1 removes some breaks
-                mask.set(i, j, color(255));
-        }
-    }
-    mask.updatePixels();
-    return mask;
-}
-
-function mirror(img) {
-    // copy a section of the canvas
-
-    // cut it into a triangular shape
-    img.mask(mask);
-
-    push();
-    // move origin to centre
-    translate(width/2,height/2);
-    // turn the whole sketch over time
-    rotate(radians(frameCount/3));
-
-    for(var i=0; i<slices; i++) {
-      if(i%2==0) {
-        push();
-        scale(1,-1); // mirror
-        image(img,0,0); // draw slice
-        pop();
-      } else {
-        rotate(radians(360/slices)*2); // rotate
-        image(img,0,0); // draw slice
-      }
-    }
-    pop();
-}
 function draw() {
   //Velocità calcolata SUL TEMPO, non su framerate.
   if (vOffset > 300) {
@@ -329,19 +276,20 @@ function draw() {
   stroke(255 - bgBrightness);
   rect(mainLSide, padding, mainRSide - mainLSide, height - padding * 2);
 
-  //AVATAR
+  //***AVATAR***//
+  //kaleidoscope under avatar
   push();
   translate(center.x-width/2,center.y-height/2+5);
   blendMode(MULTIPLY);
   mirror(kalCopy);
   pop();
+  //avatar proper starts here
   stroke(255);
   blendMode(DIFFERENCE);
   push();
   fill(avatarFill);
   noStroke();
   translate(hNoise, vNoise);
-  //scale(*avatarScale);
   beginShape();
   vertex(center.x + vNoise / 2*avatarScale, center.y + 30*avatarScale + hNoise / 2*avatarScale);
   bezierVertex( center.x - 50*avatarScale, center.y + hNoise / 2*avatarScale,
@@ -353,7 +301,7 @@ function draw() {
   endShape();
   pop();
 
-  //Righello
+  //***INDICATORE PROFONDITà***//
   for (i = topValue; i < bottomValue; i += 1) {
     let iToPx = i * 4 * 25;
     let lineWidth = 20;
@@ -385,17 +333,8 @@ function draw() {
     }
 
   }
-  //***DEPTH METER***//
-
-
-
   let meterAvatarHeight=map(vOffset,40000,-40000,padding*1.2,height-padding*1.2);
   meterAvatarHeight=limitValue(meterAvatarHeight,padding*1.2,height-padding*1.2);
-  /*if (meterAvatarHeight<=padding*1.2) {
-    meterAvatarHeight=padding*1.2;
-  } else if (meterAvatarHeight>=height-padding*1.2) {
-    meterAvatarHeight=height-padding*1.2;
-  }*/
   push(); noStroke(); fill(255);
   ellipse(padding+meterWidth/2,meterAvatarHeight,10);
   blendMode(DIFFERENCE);
@@ -587,6 +526,51 @@ Bubble.prototype.checkEdges = function() {
     this.position.y = 20;
   }
 }
+
+//The next three functions are for the kaleidoscope effect.
+function calcStuff(width, height, s) {
+  // because pythagorean theorem
+  // h = sqrt(a^2 + b^2)
+  // a = sqrt(h^2 - b^2)
+  // b = sqrt(h^2 - a^2)
+  let a = sqrt(sq(width/2)+sq(height/2));
+  let theta = radians(360 / s);
+  let o = tan(theta) * a;
+  let h = a / cos(theta);
+
+  return {a: round(a), o: round(o), h: round(h)};
+}
+function createMask(w,h) {
+    mask = createImage(w,h);
+    mask.loadPixels();
+    for (i = 0; i < mask.width; i++) {
+        for (j = 0; j < mask.height; j++) {
+            if(i >= map(j,0,h,0,w)-1) // -1 removes some breaks
+                mask.set(i, j, color(255));
+        }
+    }
+    mask.updatePixels();
+    return mask;
+}
+function mirror(img) {
+    img.mask(mask);
+    push();
+    translate(width/2,height/2);
+    rotate(radians(frameCount/3));
+    for(var i=0; i<slices; i++) {
+      if(i%2==0) {
+        push();
+        scale(1,-1); // mirror
+        image(img,0,0); // draw slice
+        pop();
+      } else {
+        rotate(radians(360/slices)*2); // rotate
+        image(img,0,0); // draw slice
+      }
+    }
+    pop();
+}
+
 
 function cullPoint(INPUT) {
   if (INPUT <= padding) {
