@@ -8,8 +8,11 @@ function preload() {
   impact = loadSound("./sounds/impact.mp3");
   wind = loadSound("./sounds/wind.mp3");
   strings2 = loadSound("./sounds/strings2.mp3");
+  beat2 = loadSound("./sounds/blood.mp3");
+
+  kaleido = loadImage("./images/kaleido.png")
 }
-let hbAmp=hAmp=h3Amp=windAmp=str2Amp=0;
+let hbAmp=hAmp=h3Amp=windAmp=str2Amp=b2Amp=0;
 
 let randomPos = [];
 
@@ -20,6 +23,10 @@ let bottomValue = 400;
 
 //Array contiene le bolle per lo splash. Forse c'è un modo migliore, non so.
 var bubbles = [];
+
+//kaleidoscope vars
+const slices = 12;
+let shape, mask, img;
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
@@ -45,6 +52,9 @@ function setup() {
     thisBub.mass += 0.1;
     bubbles.push(thisBub);
   }
+  //needed for kaleidoscope
+  shape = calcStuff(width,height,slices);
+  mask = createMask(shape.a,shape.o);
 }
 //Lati verticali del box principale, parametrici, e padding in alto e basso.
 let meterWidth=25;
@@ -71,10 +81,11 @@ let vOffset = 0;
 let avatarOff = 0;
 let avatarScale = 1;
 let avatarFill = 255;
+let jumping = 0;
 let center;
 //velocità del mondo e gravità.
 let speed = 0;
-let gravity = 0.02;
+let gravity = 0.04;
 
 //Variabili per l'effetto splash.
 //0: not splashing. 1: splash up. 2: splash down.
@@ -84,30 +95,117 @@ let allowSound = 1;
 
 let now=then=0;
 
+//kaleido vars
+let kalSize, offScreen;
+let kalAlpha = 0;
+
+function calcStuff(width, height, s) {
+  // because pythagorean theorem
+  // h = sqrt(a^2 + b^2)
+  // a = sqrt(h^2 - b^2)
+  // b = sqrt(h^2 - a^2)
+  let a = sqrt(sq(width/2)+sq(height/2));
+  let theta = radians(360 / s);
+  let o = tan(theta) * a;
+  let h = a / cos(theta);
+
+  return {a: round(a), o: round(o), h: round(h)};
+}
+function createMask(w,h) {
+    // create triangular mask so that the parts of the
+    // kaleidoscope don't draw over one another
+
+    mask = createImage(w,h);
+    mask.loadPixels();
+    for (i = 0; i < mask.width; i++) {
+        for (j = 0; j < mask.height; j++) {
+            if(i >= map(j,0,h,0,w)-1) // -1 removes some breaks
+                mask.set(i, j, color(255));
+        }
+    }
+    mask.updatePixels();
+    return mask;
+}
+
+function mirror(img) {
+    // copy a section of the canvas
+
+    // cut it into a triangular shape
+    img.mask(mask);
+
+    push();
+    // move origin to centre
+    translate(width/2,height/2);
+    // turn the whole sketch over time
+    rotate(radians(frameCount/3));
+
+    for(var i=0; i<slices; i++) {
+      if(i%2==0) {
+        push();
+        scale(1,-1); // mirror
+        image(img,0,0); // draw slice
+        pop();
+      } else {
+        rotate(radians(360/slices)*2); // rotate
+        image(img,0,0); // draw slice
+      }
+    }
+    pop();
+}
 function draw() {
   //Velocità calcolata SUL TEMPO, non su framerate.
-  function calcSpeed(DELTA,SPEED) {
-    return (SPEED*DELTA)*0.06;
+  if (vOffset > 300) {
+    bgBrightness = lerp(bgBrightness, 255, 0.05);
+  } else if (vOffset < -300) {
+    bgBrightness = lerp(bgBrightness, 0, 0.05);
   }
+  background(255);
+  //KALEIDOSCOPE
+  if (vOffset > 10000 && kalAlpha<=1) {
+    kalAlpha+=0.002;
+  }
+  if (vOffset < 10000 && kalAlpha>=0){
+    kalAlpha+=-0.01;
+  }
+  push();
+  kalSize=height*1.2;
+  offScreen = createVector(0,0);
+  blendMode(BLEND);
+  fill(255);
+  noStroke();
+  rect(offScreen.x,offScreen.y,kalSize,kalSize);
+  imageMode(CENTER);
+  for(i=0;i<6;i++) {
+    image(kaleido,offScreen.x+kalSize/2+i*50+cos(millis()/5000+i*60)*60+100,offScreen.y+kalSize/2+cos(millis()/6000+i*60)*kalSize/2,kalSize,kalSize/5);
+  }
+  fill(255,1-kalAlpha);
+  rect(-width,-height,width*3,height*3);
+  kalCopy = get(width/2,padding,kalSize,kalSize);
+  fill(bgBrightness);
+  blendMode(BLEND);
+  rect(0,0,width,height);
+  pop();
+
   now = millis();
   delta = now - then;
   vOffset += calcSpeed(delta,speed);
   speed += calcSpeed(delta,-gravity);
-  if (keyIsPressed && speed < 0) {
-    avatarScale = lerp(avatarScale,1.3,0.1);
-    avatarFill = lerp(avatarFill,50,0.5);
-    impact.play();
-    speed = 0.5;
-  } else if (keyIsPressed) {
-    avatarScale = lerp(avatarScale,1.3,0.1);
-    avatarFill = lerp(avatarFill,50,0.5);
-    impact.play();
-    speed += calcSpeed(delta,0.5);
-  } else {
-    avatarScale = lerp(avatarScale,1,0.05);
-    avatarFill = lerp(avatarFill,255,0.05);
-  }
   then=now;
+
+  if (keyIsDown(32)) {
+    /*if(jumpStrength<3) {
+      jumpStrength+=0.1;
+    } else {
+      jumpStrength=3;
+    }*/
+
+    avatarScale = lerp(avatarScale,1.3,0.1);
+    avatarFill = lerp(avatarFill,50,0.5);
+  } else {
+    jumpStrength=0;
+    avatarScale = lerp(avatarScale,1,0.1);
+    avatarFill = lerp(avatarFill,255,0.5);
+  }
   //vOffset = vOffset + speed;
   //speed = speed - gravity;
 
@@ -131,12 +229,7 @@ function draw() {
   vNoise = (noise(millis() / 100 * noiseSpeed) - 0.5) * noiseAmount;
 
   //Colore di sfondo a seconda della profondità.
-  if (vOffset > 300) {
-    bgBrightness = lerp(bgBrightness, 255, 0.05);
-  } else if (vOffset < -300) {
-    bgBrightness = lerp(bgBrightness, 0, 0.05);
-  }
-  background(200, 0, bgBrightness);
+
 
   //provvisoriamente il mouse indica le dimensioni del box. Per testing.
   mainRSide = mouseX;
@@ -237,6 +330,11 @@ function draw() {
   rect(mainLSide, padding, mainRSide - mainLSide, height - padding * 2);
 
   //AVATAR
+  push();
+  translate(center.x-width/2,center.y-height/2+5);
+  blendMode(MULTIPLY);
+  mirror(kalCopy);
+  pop();
   stroke(255);
   blendMode(DIFFERENCE);
   push();
@@ -310,6 +408,8 @@ function draw() {
   rect(padding,padding,meterWidth,height-padding*2);
 
   //***AMBIENT SOUNDS***//
+  let enableSound=true;
+  if (enableSound) {
   if (horror3.isPlaying()==false&&vOffset<0) {
     horror3.loop();
   }
@@ -334,6 +434,15 @@ function draw() {
   } else if (vOffset>-1000) {
     hbAmp=lerp(hbAmp,0,0.1);
   }
+  if (beat2.isPlaying()==false&&vOffset<-10000) {
+    beat2.amp(0.5);
+    beat2.loop();
+  }
+  if (vOffset<-10000) {
+    b2Amp=lerp(b2Amp,0.5,0.1);
+  } else {
+    b2Amp=lerp(b2Amp,0,0.01);
+  }
 
   if (wind.isPlaying()==false&&vOffset>-100) {
     wind.loop();
@@ -354,9 +463,11 @@ function draw() {
   horror.amp(hAmp);
   horror3.amp(h3Amp);
   heartbeat.amp(hbAmp);
+  beat2.amp(b2Amp);
 
   wind.amp(windAmp);
   strings2.amp(str2Amp);
+  }
 
   //***POST-PROCESSING***//
   if (vOffset > -100) {
@@ -392,7 +503,19 @@ function draw() {
     rect(0, 0, width, height);
     pop();
   }
+  if (vOffset>3000) {
+    topPostPro=lerp(topPostPro,255,0.05);
+  } else {
+    topPostPro=lerp(topPostPro,0,0.05);
+  }
+  push();
+  blendMode(ADD);
+  colorMode(RGB);
+  fill(255,0,150,topPostPro);
+  rect(0,0,width,height);
+  pop();
 }
+let topPostPro=0;
 
 function limitValue(VALUE,MIN,MAX) {
   if (VALUE<=MIN) {
@@ -474,10 +597,32 @@ function cullPoint(INPUT) {
     return INPUT;
   }
 }
-
-function keyReleased() {
-  if (keyCode === 32) {
-    spaceReleased=1;
+function calcSpeed(DELTA,SPEED) {
+  return (SPEED*DELTA)*0.06;
+}
+let jumpStrength=10;
+let jumpAmount=40;
+function keyPressed() {
+  if (keyCode===32) {
+    if (jumpAmount>2) {
+      jumpAmount*=0.95;
+    }
+    let offsetJump=jumpAmount;
+    if (vOffset<200) {
+      offsetJump=lerp(offsetJump,jumpAmount*0.8,0.1);
+    }
+    now = millis();
+    delta = now - then;
+    vOffset += calcSpeed(delta,speed);
+    speed += calcSpeed(delta,-gravity);
+  if (speed < 0) {
+    impact.play();
+    speed += calcSpeed(delta,offsetJump);
+  } else {
+    impact.play();
+    speed += calcSpeed(delta,offsetJump);
+  }
+  then = now;
   }
 }
 
