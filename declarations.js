@@ -19,7 +19,7 @@ let shape, mask, img;
 let meterWidth=25;
 const padding = 40;
 let mainLSide = meterWidth+padding+padding*.75;
-let mainRSide = 900;
+let mainRSide = 900; // * Mappato su MouseX nel draw
 
 //Variabili per il noise che uso per variare certe trasformazioni.
 var hNoise, vNoise;
@@ -35,7 +35,8 @@ let mapVar = 0;
 let bgBrightness = 0;
 
 //praticamente è la profondità.
-let vOffset = 0;
+let vOffset = 0; // moltiplicarlo per un numero più piccoli
+
 //movimento dell'avatar (cuore). L'avatar in realtà resta fermo, mentre il resto del mondo si muove.
 let avatarOff = 0;
 let avatarScale = 1;

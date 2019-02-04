@@ -254,7 +254,7 @@ function draw() {
   endShape();
   pop();
 
-  //***INDICATORE PROFONDITà***//
+  //***INDICATORE PROFONDITÀ***//
   for (i = topValue; i < bottomValue; i += 1) {
     let iToPx = i * 4 * 25;
     let lineWidth = 20;
@@ -298,6 +298,8 @@ function draw() {
   blendMode(BLEND);
   stroke(255-bgBrightness);
   rect(padding,padding,meterWidth,height-padding*2);
+
+  //*** INDICATORE SINTOMI***//
 
   //***AMBIENT SOUNDS***//
   let enableSound=true;
