@@ -254,17 +254,7 @@ function keyPressed() {
     if (vOffset<200) {
       offsetJump=lerp(offsetJump,jumpAmount*0.8,0.1);
     }
-    now = millis();
-    delta = now - then;
-    vOffset += calcSpeed(delta,speed);
-    speed += calcSpeed(delta,-gravity);
-  if (speed < 0) {
-    impact.play();
-    speed += offsetJump;
-  } else {
-    impact.play();
-    speed += offsetJump;
-  }
-  then = now;
+  impact.play();
+  speed += offsetJump;
   }
 }

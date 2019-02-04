@@ -14,8 +14,6 @@ function preload() {
   tension = loadSound("./sounds/tension.mp3");
 
   kaleido = loadImage("./images/kaleido.png");
-  gradient = loadImage("./images/gradient.png");
-  gradient2 = loadImage("./images/gradient2.png");
 }
 
 
