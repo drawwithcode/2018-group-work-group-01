@@ -19,6 +19,8 @@ var bubbles = [];
 //kaleidoscope vars
 const slices = 12;
 let shape, mask, img;
+let kalSize, offScreen;
+let kalAlpha = 0;
 
 
 //Lati verticali del box principale, parametrici, e padding in alto e basso.
@@ -63,9 +65,7 @@ let splashSpeed = 0;
 
 let now=then=0;
 
-//kaleido vars
-let kalSize, offScreen;
-let kalAlpha = 0;
+
 
 let topPostPro=0;
 

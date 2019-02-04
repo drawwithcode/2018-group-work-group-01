@@ -136,11 +136,6 @@ function draw() {
     avatarScale = lerp(avatarScale,1,0.1);
     avatarFill = lerp(avatarFill,255,0.5);
   }
-  //vOffset = vOffset + speed;
-  //speed = speed - gravity;
-
-  //In risposta a evento, viene data spinta verso l'alto.
-  //Questa parte è provvisoria. L'evento è sbagliato e la spinta non deve essere costante.
 
   //mapVar a seconda della profondità.
   if (vOffset < -8000 && mapVar <= 2) {
@@ -167,9 +162,6 @@ function draw() {
   fill(0);
   stroke(255);
   rect(mainLSide, padding, mainRSide - mainLSide, height - padding * 2);
-
-  //posizione dell'avatar
-
 
 
   //***MARE-CIELO***
