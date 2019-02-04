@@ -1,4 +1,10 @@
-let hbAmp=hAmp=h3Amp=windAmp=str2Amp=b2Amp=0;
+//GAME STATE. 0=Game paused; 1= game started (phase 1); 2= phase 2; 3 = phase 3.
+let gameState=0
+
+
+//audio vars.
+let enableSound=0;
+let hbAmp=hAmp=h3Amp=windAmp=wind2Amp=str2Amp=b2Amp=tensAmp=0;
 
 let randomPos = [];
 
@@ -17,8 +23,9 @@ let shape, mask, img;
 
 //Lati verticali del box principale, parametrici, e padding in alto e basso.
 let meterWidth=25;
+let meterPos=-70;
 const padding = 40;
-let mainLSide = meterWidth+padding+padding*.75;
+let mainLSide = padding;
 let mainRSide = 900;
 
 //Variabili per il noise che uso per variare certe trasformazioni.
@@ -50,7 +57,7 @@ let gravity = 0.04;
 //0: not splashing. 1: splash up. 2: splash down.
 let splashState = 0;
 let splashAmount = 0;
-let allowSound = 1;
+let allowSplashSound = 1;
 let splashSpeed = 0;
 
 let now=then=0;
@@ -64,7 +71,7 @@ let topPostPro=0;
 //for red post-processing near fail areas.
 let failApproach=0;
 
-function bottomFailArea() {
+function bottomFailArea(DEPTH) {
   let img = createImage(66, 66);
   img.loadPixels();
   for (let i = 0; i < img.width; i++) {
@@ -73,17 +80,18 @@ function bottomFailArea() {
     }
   }
   img.updatePixels();
-  let depth = 27000;
-  let topPos = cullPoint(padding+depth+vOffset);
-  let gradTopPos = cullPoint(padding+depth+vOffset-2000);
-  let bottomPos = cullPoint(height*2+padding+depth+vOffset);
+  let depth = DEPTH;
+  let topPos = cullPoint(depth+vOffset);
+  let gradTopPos = cullPoint(depth+vOffset-2000);
+  let bottomPos = cullPoint(height*2+depth+vOffset);
   if (topPos-gradTopPos>0) {
     image(img,mainLSide,gradTopPos,mainRSide-mainLSide,topPos-gradTopPos);
   }
   fill(255);
   rect(mainLSide,topPos,mainRSide-mainLSide,bottomPos-topPos);
+  return topPos;
 }
-function topFailArea() {
+function topFailArea(DEPTH) {
   let img = createImage(66, 66);
   img.loadPixels();
   for (let i = 0; i < img.width; i++) {
@@ -92,16 +100,17 @@ function topFailArea() {
     }
   }
   img.updatePixels();
-  let depth = -27000;
-  let topPos = cullPoint(padding+depth+vOffset);
-  let bottomPos = cullPoint(height*2+padding+depth+vOffset);
-  let gradBottomPos = cullPoint(height*2+padding+depth+vOffset+2000);
+  let depth = DEPTH;
+  let topPos = cullPoint(depth+vOffset);
+  let bottomPos = cullPoint(height*2+depth+vOffset);
+  let gradBottomPos = cullPoint(height*2+depth+vOffset+2000);
   if(gradBottomPos-bottomPos>0) {
     image(img,mainLSide,bottomPos,mainRSide-mainLSide,gradBottomPos-bottomPos);
   }
 
   fill(0);
   rect(mainLSide,topPos,mainRSide-mainLSide,bottomPos-topPos);
+  return bottomPos;
 }
 
 
@@ -233,12 +242,12 @@ function cullPoint(INPUT) {
 function calcSpeed(DELTA,SPEED) {
   return (SPEED*DELTA)*0.06;
 }
-let jumpStrength=10;
-let jumpAmount=40;
+
+let jumpAmount=30;
 function keyPressed() {
   if (keyCode===32) {
-    if (jumpAmount>2) {
-      jumpAmount*=0.95;
+    if (jumpAmount>0.7) {
+      jumpAmount*=0.80;
     }
     let offsetJump=jumpAmount;
     if (vOffset<200) {
