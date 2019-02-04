@@ -25,7 +25,7 @@ The experience is designed to be played on a computer, as interaction revolves a
 
 ## Key Features
 We hereby present some of the most noteworthy features of our project.
-##### Multiple tiling windows
+#### Multiple tiling windows
 The screen is, at any moment, divided in up to three windows.
 The central window is the most important: it offers a vertically scrolling view of the player's depth, in a sort of a zoomed-in state.
 The left window is a height meter which shows the player's total depth compared to the world.
@@ -58,7 +58,7 @@ function draw() {
   }
 }
 ```
-##### Vertical scrolling with culling
+#### Vertical scrolling with culling
 To simulate scrolling on the main window, we do not move the player avatar (to be precise, we move it partially according to its speed to offer some feedback); instead, we move all other elements vertically.<br>
 The variable `vOffset` controls all scrolling behaviour; it is an indicator of height. All elements that are meant to scroll are translated by this variable. <br>
 All of these are mapped to height and therefore will not be present on the screen at all times. For this reason, we *cull*, or hide, elements that are outside the window for performance reasons (otherwise, we would need to render 20 000 instances of text alone every frame). To prevent pop-in, we move points of larger objects, such as rectangles, to make them fit the window.
@@ -105,7 +105,7 @@ for (i = topValue; i < bottomValue; i += 1) {
   }
 }
 ```
-##### Animated waves and splash
+#### Animated waves and splash
 To depict the water surface, we adapted the [Noise Wave](https://p5js.org/examples/math-noise-wave.html) code found on the p5.js website's example section.
 ```javascript
 beginShape();
@@ -207,7 +207,7 @@ Bubble.prototype.checkEdges = function() {
   }
 }
 ```
-##### Time-based movement
+#### Time-based movement
 During testing, we noticed wildly varying performance across different hardware, operating systems, and browsers. Letting gravity affect movement based on framerate (such as running `vOffset+=1` every draw cycle) rendered the experience painfully slow in some cases.
 Therefore, we calculate speed and position based on time, through p5.js' `millis()` function.<br>
 A `delta` variable determines the amount of time passing between each frame, so that speed increments can be consistent.
@@ -224,7 +224,7 @@ function calcSpeed(DELTA,SPEED) {
 }
 ```
 Bubbles do not use time-based movement.
-##### Kaleidoscope effect
+#### Kaleidoscope effect
 To hint at the effects of a high, we have a kaleidoscope effect played around the player avatar at high altitudes. The following functions are adapted from [this](https://cs.anu.edu.au/courses/comp1720/labs/05-kaleidoscope/) page.
 ```javascript
 //Used to duplicate elements to form "slices" in a kaleidoscope.
@@ -309,7 +309,7 @@ Through the `mirror()` function listed above, the image is masked and duplicated
 ```javascript
 mirror(kalCopy);
 ```
-##### Post-processing and blending modes
+#### Post-processing and blending modes
 To represent the varying conditions of distress of the subject, we use some techniques that let us change the appearance of the entire screen.<br>
 First of all, with negative altitude the whole image becomes white on black, while positive altitudes invert these colors. This is achieved in part through use of a global `bgBrightness` variable, and in part through use of p5.js' color blending modes; in particular, `blendMode(DIFFERENCE)`. This means that elements such as the player avatar and the depth indicator are always rendered in the inverse color of their background. It is not necessary, therefore, to manually change fill colors for most elements depending on altitude.<br>
 Furthermore, we use what might be described as post-processing effects to change the color of the whole screen. We draw colored rectangles with `MULTIPLY` or `ADD` blend modes on top of the screen, which would otherwise be in black and white. <br>
