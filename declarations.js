@@ -42,7 +42,8 @@ let mapVar = 0;
 let bgBrightness = 0;
 
 //praticamente è la profondità.
-let vOffset = 0;
+let vOffset = 0; // moltiplicarlo per un numero più piccoli
+
 //movimento dell'avatar (cuore). L'avatar in realtà resta fermo, mentre il resto del mondo si muove.
 let avatarOff = 0;
 let avatarScale = 1;

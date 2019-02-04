@@ -289,7 +289,7 @@ function draw() {
   endShape();
   pop();
 
-  //***INDICATORE PROFONDITà***//
+  //***INDICATORE PROFONDITÀ***//
   push();
   for (i = topValue; i < bottomValue; i += 1) {
     let iToPx = i * 4 * 25;
@@ -338,6 +338,8 @@ function draw() {
   rect(padding,padding,meterWidth,height-padding*2);
   translate(-meterPos,0);
 
+
+  //*** INDICATORE SINTOMI***//
 
   //***AMBIENT SOUNDS***//
   if (enableSound) {
