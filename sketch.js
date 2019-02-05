@@ -55,13 +55,13 @@ function setup() {
   //organs
 
   //_keyCode,_xFromSide,_yFromTop,_width,_height,_symptoms,_xFromSideText_yFromTopText,_treatmentTime
-  brain = new Organ(69,325,70,40,40,brainSymptoms,205,73,5000); //E
-  lungs = new Organ(83,385,300,40,40,lungsSymptoms,440,200,5000); //S
-  veins = new Organ(70,470,300,40,40,veinsSymptoms,530,153,5000); //F
-  skin = new Organ(78,165,540,40,40,skinSymptoms,70,543,5000); //N
-  heart = new Organ(77,340,375,40,40,heartSymptoms,90,320,5000); //M
-  intestines = new Organ(75,325,500,40,40,intestinesSymptoms,75,440,5000); //K
-  muscle = new Organ(66,190,300,40,40,muscleSymptoms,190,200,5000); //B
+  brain = new Organ(89,0.5,0.15,40,40,brainSymptoms,0.55,0.2,5000); //E
+  lungs = new Organ(71,0.41,0.5,40,40,lungsSymptoms,.46,.55,5000); //S
+  veins = new Organ(75,0.8,0.5,40,40,veinsSymptoms,.85,.55,5000); //F
+  skin = new Organ(90,0.15,0.8,40,40,skinSymptoms,.2,.85,5000); //N
+  heart = new Organ(72,0.5,0.61,40,40,heartSymptoms,.55,.66,5000); //M
+  intestines = new Organ(66,0.5,0.75,40,40,intestinesSymptoms,.55,.8,5000); //K
+  muscle = new Organ(65,0.15,0.5,40,40,muscleSymptoms,.2,.55,5000); //B
   organs.push(brain,lungs,veins,skin,heart,intestines,muscle);
 
   setTimeout(function() {
@@ -126,6 +126,8 @@ function draw() {
     }
   }
   if (gameState==2) {
+    meterPos=lerp(meterPos,0,0.02);
+    mainLSide=lerp(mainLSide, padding+meterWidth+padding*.75,0.02);
     mainRSide=lerp(mainRSide,width-padding*1.75-sidePanelWidth,0.02);
     sidePanelPos=(mainRSide+padding*.75);
   }
@@ -406,6 +408,7 @@ function draw() {
   //*** INDICATORE SINTOMI***//
   push();
   blendMode(DIFFERENCE);
+  sidePanelWidth=outline.width/outline.height*(height-padding*2);
   var imageX = mainRSide - mainLSide + padding * 3;
   var imageY = height - padding - sidePanelWidth*outline.height/outline.width;
   var imageHeight = sidePanelWidth*outline.height/outline.width;

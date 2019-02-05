@@ -347,7 +347,7 @@ function setSymptom(_organ, _symptomStage, _delay) {
 }
 
 // Keycode of corresponding letter, x and y from left and top of image, width, height, symptom lits, x and y of symptom text, time of treatment in milliseconds
-function Organ(_keyCode, _xFromSide, _yFromTop, _width, _height, _symptoms, _xFromSideText, _yFromTopText, _treatmentTime) {
+function Organ(_keyCode, _xPos, _yPos, _width, _height, _symptoms, _xPosText, _yPosText, _treatmentTime) {
 
   // Hardcoded properties
   this.symptomStage = 0;
@@ -363,16 +363,20 @@ function Organ(_keyCode, _xFromSide, _yFromTop, _width, _height, _symptoms, _xFr
   // Methods
   this.display = function() {
 
-    x = _xFromSide - _width / 2 + mainRSide - mainLSide + padding * 3;
+    /*x = _xFromSide - _width / 2 + mainRSide - mainLSide + padding * 3;
     y = height - padding - sidePanelWidth * outline.height / outline.width + _yFromTop;
     xText = _xFromSideText - _width / 2 + mainRSide - mainLSide + padding * 3;
-    yText = height - padding - sidePanelWidth * outline.height / outline.width + _yFromTopText;
+    yText = height - padding - sidePanelWidth * outline.height / outline.width + _yFromTopText;*/
+    x = mainRSide+padding*.75+ _xPos*sidePanelWidth -_width/2;
+    y = padding + _yPos*(height-padding*2) -_height/2;
+    xText = mainRSide+padding*.75+ _xPosText*sidePanelWidth;
+    yText = padding + _yPosText*(height-padding*2);
 
     // Rectangle
-    blendMode(NORMAL);
-    fill(0);
+    blendMode(BLEND);
+    fill(bgBrightness);
     strokeWeight(1);
-    stroke(255);
+    stroke(255-bgBrightness);
     rect(x, y, _width, _height);
 
     // Letter
@@ -380,7 +384,7 @@ function Organ(_keyCode, _xFromSide, _yFromTop, _width, _height, _symptoms, _xFr
     textAlign(CENTER);
     textSize(Math.round(_width * 0.7));
     textStyle(BOLD);
-    fill(255);
+    fill(255-bgBrightness);
     noStroke();
     text(String.fromCharCode(_keyCode), x+_width/2, y+_height/1.3);
 
@@ -388,22 +392,19 @@ function Organ(_keyCode, _xFromSide, _yFromTop, _width, _height, _symptoms, _xFr
     if (this.symptomStage != this.treatedSymptomsStage) {
       blendMode(DIFFERENCE);
       textSize(this.symptomTextSize);
-      textStyle(NORMAL);
-      switch (this.symptomStage) {
-        case 1:
-          text(this.symptoms["one"], xText, yText);
-          break;
-        case 2:
-          text(this.symptoms["two"], xText, yText);
-          break;
-        default:
-          text(this.symptoms["three"], xText, yText);
-      }
-
+      textStyle(BOLD);
+      blendMode(BLEND);
+      push();
+      textAlign(LEFT, TOP);
+      fill(bgBrightness);
+      rect(xText-6,yText-6,180,28);
+      fill(255-bgBrightness);
+      text(this.symptoms["one"], xText, yText);
+      pop();
       stroke(1);
-      stroke(255);
+      stroke(255-bgBrightness);
       var angle = atan((y + _height / 2 - yText) / (x + _width / 2 - xText));
-      if (angle > 0) {
+      if (angle < 0) {
         line(xText, yText + this.symptomTextSize * 0.8,
           x + _width / 2 - this.arrowMargin * cos(angle),
           y + _height / 2 - this.arrowMargin * sin(angle));
@@ -422,7 +423,7 @@ function Organ(_keyCode, _xFromSide, _yFromTop, _width, _height, _symptoms, _xFr
       if (this.startOfTreatment == null) {
         this.startOfTreatment = millis();
       }
-      stroke(255);
+      stroke(255-bgBrightness);
       strokeWeight(5);
       var quarterTreatmentProgress = (millis() - this.startOfTreatment) / (_treatmentTime / 4);
       if (this.treatmentStage == 0) {
