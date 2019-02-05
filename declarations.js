@@ -540,7 +540,7 @@ function titleScreen() {
   pop();
 }
 let storySlide = 1;
-
+let playerDied=0;
 function failScreen() {
   push();
   let fillSb = 0;
@@ -569,7 +569,11 @@ function failScreen() {
   textAlign(CENTER);
   fill(255);
   if (storySlide < 5) {
-    text(storySlide + '.', windowWidth / 2, windowHeight / 2 - 100);
+    if (playerDied&&storySlide==4) {
+      text("Again.", windowWidth / 2, windowHeight / 2 - 100);
+    } else {
+      text(storySlide + '.', windowWidth / 2, windowHeight / 2 - 100);
+    }
   }
   if (storySlide == 5) {
     text("Overdose", windowWidth / 2, windowHeight / 2 - 100);
@@ -676,6 +680,7 @@ function failScreen() {
       if (mouseIsPressed && canPressMouse) {
         storySlide = 1;
         gameState = -1;
+        playerDied=0;
         canPressMouse = 0;
         cursor('auto');
       }

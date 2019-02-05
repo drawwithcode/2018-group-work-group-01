@@ -141,6 +141,7 @@ function draw() {
   }
   if((height-center.y)>(26150-topFailIncrease)-vOffset||(height-center.y)<-(26300)-vOffset) {
     gameState=0;
+    playerDied=1;
     if(inception.isPlaying()==false) {
       inception.play();
     }
