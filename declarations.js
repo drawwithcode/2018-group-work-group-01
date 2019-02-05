@@ -399,7 +399,17 @@ function Organ(_keyCode, _xPos, _yPos, _width, _height, _symptoms, _xPosText, _y
       fill(bgBrightness);
       rect(xText-6,yText-6,180,28);
       fill(255-bgBrightness);
-      text(this.symptoms["one"], xText, yText);
+      textStyle(NORMAL);
+      switch (this.symptomStage) {
+        case 1:
+          text(this.symptoms["one"], xText, yText);
+          break;
+        case 2:
+          text(this.symptoms["two"], xText, yText);
+          break;
+        default:
+          text(this.symptoms["three"], xText, yText);
+      }
       pop();
       stroke(1);
       stroke(255-bgBrightness);
