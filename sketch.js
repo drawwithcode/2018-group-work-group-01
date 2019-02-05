@@ -53,14 +53,16 @@ function setup() {
   shape = calcStuff(width,height,slices);
   mask = createMask(shape.a,shape.o);
   //organs
-  //_keyCode,_xFromSide,_yFromTop,_width,_height,_treatmentTime
-  brain = new Organ(69,225,60,40,40,5000); //E
-  lungs = new Organ(83,280,250,40,40,5000); //S
-  veins = new Organ(70,350,280,40,40,5000); //F
-  skin = new Organ(78,50,450,40,40,5000); //N
-  heart = new Organ(77,235,330,40,40,5000); //M
-  intestines = new Organ(75,225,440,40,40,5000); //K
-  muscle = new Organ(66,90,260,40,40,5000); //B
+
+  //_keyCode,_xFromSide,_yFromTop,_width,_height,_symptoms,_xFromSideText_yFromTopText,_treatmentTime
+  brain = new Organ(69,325,70,40,40,brainSymptoms,205,73,5000); //E
+  lungs = new Organ(83,385,300,40,40,lungsSymptoms,440,200,5000); //S
+  veins = new Organ(70,470,300,40,40,veinsSymptoms,530,153,5000); //F
+  skin = new Organ(78,165,540,40,40,skinSymptoms,70,543,5000); //N
+  heart = new Organ(77,340,375,40,40,heartSymptoms,90,320,5000); //M
+  intestines = new Organ(75,325,500,40,40,intestinesSymptoms,75,440,5000); //K
+  muscle = new Organ(66,190,300,40,40,muscleSymptoms,190,200,5000); //B
+  organs.push(brain,lungs,veins,skin,heart,intestines,muscle);
 
 }
 
@@ -388,13 +390,9 @@ function draw() {
   image(heartImage,imageX, imageY, sidePanelWidth, imageHeight);
   image(intestinesImage,imageX, imageY, sidePanelWidth, imageHeight);
   image(muscleImage,imageX, imageY, sidePanelWidth, imageHeight);
-  brain.display();
-  lungs.display();
-  veins.display();
-  skin.display();
-  heart.display();
-  intestines.display();
-  muscle.display();
+  for (var i = 0; i < organs.length; i++) {
+    organs[i].display();
+  }
   pop();
 
   strokeWeight(1);
@@ -555,7 +553,7 @@ function draw() {
   if (gameState==0) {
     fail.partTwo();
   }
-
+  vOffset=0;
 }
 
 function windowResized() {
