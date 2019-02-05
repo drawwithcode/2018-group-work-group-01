@@ -30,8 +30,6 @@ function preload() {
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
   colorMode(HSB);
-  textSize(17);
-  textAlign(RIGHT, CENTER);
   strokeWeight(1);
   //prendo un po' di valori a caso che mi servono dopo per posizionare le linee cinetiche.
   for (i = topValue; i < bottomValue; i++) {
@@ -55,15 +53,15 @@ function setup() {
   shape = calcStuff(width,height,slices);
   mask = createMask(shape.a,shape.o);
   //organs
-  //_keyCode,_xFromSide,_yFromTop,_width,_height,_treatmentTime
-  brain = new Organ(69,225,60,40,40,5000); //E
-  lungs = new Organ(83,280,250,40,40,5000); //S
-  veins = new Organ(70,350,280,40,40,5000); //F
-  skin = new Organ(78,50,450,40,40,5000); //N
-  heart = new Organ(77,235,330,40,40,5000); //M
-  intestines = new Organ(75,225,440,40,40,5000); //K
-  muscle = new Organ(66,90,260,40,40,5000); //B
-
+  //_keyCode,_xFromSide,_yFromTop,_width,_height,_symptoms,_xFromSideText_yFromTopText,_treatmentTime
+  brain = new Organ(69,325,70,40,40,brainSymptoms,205,73,5000); //E
+  lungs = new Organ(83,385,300,40,40,lungsSymptoms,440,200,5000); //S
+  veins = new Organ(70,470,300,40,40,veinsSymptoms,530,153,5000); //F
+  skin = new Organ(78,165,540,40,40,skinSymptoms,70,543,5000); //N
+  heart = new Organ(77,340,375,40,40,heartSymptoms,90,320,5000); //M
+  intestines = new Organ(75,325,500,40,40,intestinesSymptoms,75,440,5000); //K
+  muscle = new Organ(66,190,300,40,40,muscleSymptoms,190,200,5000); //B
+  organs.push(brain,lungs,veins,skin,heart,intestines,muscle);
 }
 
 
@@ -72,7 +70,7 @@ function draw() {
   center = createVector(mainLSide + (mainRSide - mainLSide) / 2, height / 2 + avatarOff);
   center.y = limitValue(center.y, padding*3, height-padding*3);
   //***GAME STATE***//
-  if (gameState==0) {
+  if (gameState<1) {
     vOffset=-200;
     speed=0;
     jumpAmount=28;
@@ -83,6 +81,7 @@ function draw() {
     if (keyIsDown(32)) {
       gameState=1;
       speed+=jumpAmount;
+      inception.play();
     }
   } else {
     enableSound=1;
@@ -103,6 +102,12 @@ function draw() {
     gameState=0;
     if(inception.isPlaying()==false) {
       inception.play();
+    }
+    if (vOffset>0) {
+      storySlide=5;
+    }
+    if (vOffset<0) {
+      storySlide=6;
     }
   }
   //Velocità calcolata SUL TEMPO, non su framerate.
@@ -323,6 +328,8 @@ function draw() {
       push();
       noStroke();
       fill(255);
+      textSize(17);
+      textAlign(RIGHT, CENTER);
       if (vPos < height - padding - 7 && vPos > padding + 7) {
         text(-i * 25, mainRSide - lineWidth - 10, vPos);
       }
@@ -371,13 +378,12 @@ function draw() {
   image(heartImage,imageX, imageY, sidePanelWidth, imageHeight);
   image(intestinesImage,imageX, imageY, sidePanelWidth, imageHeight);
   image(muscleImage,imageX, imageY, sidePanelWidth, imageHeight);
-  brain.display();
-  lungs.display();
-  veins.display();
-  skin.display();
-  heart.display();
-  intestines.display();
-  muscle.display();
+  blendMode(NORMAL);
+
+  for (var i = 0; i < organs.length; i++) {
+    organs[i].display();
+  }
+
   pop();
 
   strokeWeight(1);
@@ -469,8 +475,19 @@ function draw() {
   tension.amp(tensAmp);
 }
 
+  //***TITLE SCREEN***//
+  if(gameState==-1) {
+    mapVar=2;
+    title=new titleScreen();
+  }
+  if (gameState==0) {
+    mapVar=2;
+    fail=new failScreen();
+  }
+
+
   //***POST-PROCESSING***//
-  if (vOffset > -5000) {
+  if (vOffset > -5000 && gameState>0) {
     postPro = false;
   } else {
     postPro = true;
@@ -521,17 +538,14 @@ function draw() {
   noStroke();
   rect(0,0,width,height);
   pop();
-  if(gameState==0) {
-    push();
-    fill(0,0.9);
-    noStroke();
-    rect(0,0,width,height);
-    fill(255);
-    textAlign(LEFT);
-    text("Press Space to start.",100,100);
-    pop();
+  if(gameState==-1) {
+    title.partTwo();
+  }
+  if (gameState==0) {
+    fail.partTwo();
   }
 
+  vOffset = 0;
 }
 
 function windowResized() {
