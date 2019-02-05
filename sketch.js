@@ -7,12 +7,15 @@ function preload() {
   heartbeat = loadSound("./sounds/heartbeat.mp3");
   impact = loadSound("./sounds/impact.mp3");
   wind = loadSound("./sounds/wind.mp3");
+  wind2 = loadSound("./sounds/wind2.mp3");
   strings2 = loadSound("./sounds/strings2.mp3");
   beat2 = loadSound("./sounds/blood.mp3");
+  inception = loadSound("./sounds/boom.mp3");
+  tension = loadSound("./sounds/tension.mp3");
 
   kaleido = loadImage("./images/kaleido.png");
-  //gradient = loadImage("./images/gradient.png");
-  //gradient2 = loadImage("./images/gradient2.png");
+
+  //organ display
   outline = loadImage("./images/body-outline.png");
   brainImage = loadImage("./images/brain.png");
   lungsImage = loadImage("./images/lungs.png");
@@ -51,7 +54,8 @@ function setup() {
   //needed for kaleidoscope
   shape = calcStuff(width,height,slices);
   mask = createMask(shape.a,shape.o);
-
+  //organs
+  //_keyCode,_xFromSide,_yFromTop,_width,_height,_treatmentTime
   brain = new Organ(69,225,60,40,40,5000); //E
   lungs = new Organ(83,280,250,40,40,5000); //S
   veins = new Organ(70,350,280,40,40,5000); //F
@@ -59,10 +63,48 @@ function setup() {
   heart = new Organ(77,235,330,40,40,5000); //M
   intestines = new Organ(75,225,440,40,40,5000); //K
   muscle = new Organ(66,90,260,40,40,5000); //B
+
 }
 
 
 function draw() {
+  //AVATAR POSITION
+  center = createVector(mainLSide + (mainRSide - mainLSide) / 2, height / 2 + avatarOff);
+  center.y = limitValue(center.y, padding*3, height-padding*3);
+  //***GAME STATE***//
+  if (gameState==0) {
+    vOffset=-200;
+    speed=0;
+    jumpAmount=28;
+    mainRSide=width-padding;
+    center.y=height/2;
+    enableSound=0;
+    sidePanelPos=width+padding;
+    if (keyIsDown(32)) {
+      gameState=1;
+      speed+=jumpAmount;
+    }
+  } else {
+    enableSound=1;
+  }
+  if (gameState==1&&jumpAmount<28) {
+    meterPos=lerp(meterPos,0,0.02);
+    mainLSide=lerp(mainLSide, padding+meterWidth+padding*.75,0.02);
+    sidePanelPos=width+padding;
+    if (jumpAmount<2) {
+      gameState=2;
+    }
+  }
+  if (gameState==2) {
+    mainRSide=lerp(mainRSide,width-padding*1.75-sidePanelWidth,0.02);
+    sidePanelPos=(mainRSide+padding*.75);
+  }
+  if((height-center.y)>26150-vOffset||(height-center.y)<-26300-vOffset) {
+    gameState=0;
+    if(inception.isPlaying()==false) {
+      inception.play();
+    }
+  }
   //Velocità calcolata SUL TEMPO, non su framerate.
   if (vOffset > 300) {
     bgBrightness = lerp(bgBrightness, 255, 0.05);
@@ -71,10 +113,10 @@ function draw() {
   }
   background(255);
   //KALEIDOSCOPE
-  if (vOffset > 10000 && kalAlpha<=1) {
+  if (vOffset > 13000 && kalAlpha<=1) {
     kalAlpha+=0.002;
   }
-  if (vOffset < 10000 && kalAlpha>=0){
+  if (vOffset < 13000 && kalAlpha>=0 || vOffset > 23000 && kalAlpha>=0){
     kalAlpha+=-0.01;
   }
   push();
@@ -117,40 +159,37 @@ function draw() {
     avatarScale = lerp(avatarScale,1,0.1);
     avatarFill = lerp(avatarFill,255,0.5);
   }
-  //vOffset = vOffset + speed;
-  //speed = speed - gravity;
-
-  //In risposta a evento, viene data spinta verso l'alto.
-  //Questa parte è provvisoria. L'evento è sbagliato e la spinta non deve essere costante.
 
   //mapVar a seconda della profondità.
-  if (vOffset < -2000 && mapVar <= 2) {
+  if (vOffset < -8000 && mapVar <= 2) {
     mapVar = lerp(mapVar, 2, 0.01);
   }
-  if (vOffset > -2000 && mapVar >= 0) {
+  if (vOffset > -8000 && mapVar >= 0) {
     mapVar = lerp(mapVar, 0, 0.01);
   }
   //Movimento dell'avatar. Noise+oscillazione verticale.
   avatarOff = lerp(avatarOff, speed * 10, 0.05) + cos(millis()*0.06 / 30);
   noiseSpeed = 0.2;
   noiseAmount = mapVar * 30;
+  if (vOffset<-25000||vOffset>24000) {
+    noiseSpeed =0.4;
+    noiseAmount=50;
+  }
   noiseSeed(9);
   hNoise = (noise(millis() / 100 * noiseSpeed) - 0.5) * noiseAmount;
   noiseSeed(10);
   vNoise = (noise(millis() / 100 * noiseSpeed) - 0.5) * noiseAmount;
 
-  //Colore di sfondo a seconda della profondità.
 
-  //Sfondo del box.
+  //sfondo del box.
   fill(0);
   stroke(255);
   rect(mainLSide, padding, mainRSide - mainLSide, height - padding * 2);
-
-  rect(mainRSide - mainLSide + padding * 3, padding, sidePanelWidth, height - padding * 2);
-
-  //posizione dell'avatar
-  center = createVector(mainLSide + (mainRSide - mainLSide) / 2, height / 2 + avatarOff);
-  center.y = limitValue(center.y, padding*3, height-padding*3);
+  push();
+  noFill();
+  blendMode(DIFFERENCE);
+  rect(sidePanelPos, padding, sidePanelWidth, height - padding * 2);
+  pop();
 
 
   //***MARE-CIELO***
@@ -181,8 +220,8 @@ function draw() {
   endShape(CLOSE);
 
   //FAIL AREAS
-  bottomFailArea();
-  topFailArea();
+  bottomFailArea(27000);
+  topFailArea(-27000);
 
   //SPLASH
   blendMode(MULTIPLY);
@@ -192,7 +231,7 @@ function draw() {
   let splashing = 0;
   if (vOffset < 10 && vOffset > -10) {
     splashing = 1;
-    if(allowSound) {
+    if(allowSplashSound&&enableSound) {
       if(speed>0) {
         splash1.rate(2);
         splash3.rate(1);
@@ -202,8 +241,8 @@ function draw() {
       }
       splash1.play();
       splash3.play();
-      allowSound=0;
-      setTimeout(function(){allowSound=1},1000);
+      allowSplashSound=0;
+      setTimeout(function(){allowSplashSound=1},1000);
     }
   }
   if (splashing && splashState == 0 || splashing && splashState == 2) {
@@ -269,6 +308,7 @@ function draw() {
   pop();
 
   //***INDICATORE PROFONDITÀ***//
+  push();
   for (i = topValue; i < bottomValue; i += 1) {
     let iToPx = i * 4 * 25;
     let lineWidth = 20;
@@ -300,6 +340,8 @@ function draw() {
     }
 
   }
+  //meter
+  translate(meterPos,0);
   let meterAvatarHeight=map(vOffset,40000,-40000,padding*1.2,height-padding*1.2);
   meterAvatarHeight=limitValue(meterAvatarHeight,padding*1.2,height-padding*1.2);
   push(); noStroke(); fill(255);
@@ -307,13 +349,17 @@ function draw() {
   blendMode(DIFFERENCE);
   rect(padding,height/2,meterWidth,height/2-padding);
   pop();
-  bottomFail = new failArea(padding,padding,meterWidth,(height-padding*2)/6);
-  bottomFail = new failArea(padding,height-padding-(height-padding*2)/6,meterWidth,(height-padding*2)/6);
+  bottomFail = new failArea(padding,padding,meterWidth,(height-padding*2)*0.18);
+  bottomFail = new failArea(padding,height-padding-(height-padding*2)*0.18,meterWidth,(height-padding*2)*0.18);
   blendMode(BLEND);
   stroke(255-bgBrightness);
   rect(padding,padding,meterWidth,height-padding*2);
+  translate(-meterPos,0);
+
 
   //*** INDICATORE SINTOMI***//
+  push();
+  blendMode(DIFFERENCE);
   var imageX = mainRSide - mainLSide + padding * 3;
   var imageY = height - padding - sidePanelWidth*outline.height/outline.width;
   var imageHeight = sidePanelWidth*outline.height/outline.width;
@@ -332,12 +378,12 @@ function draw() {
   heart.display();
   intestines.display();
   muscle.display();
+  pop();
 
   strokeWeight(1);
   textSize(20);
 
   //***AMBIENT SOUNDS***//
-  let enableSound=true;
   if (enableSound) {
   if (horror3.isPlaying()==false&&vOffset<0) {
     horror3.loop();
@@ -355,24 +401,23 @@ function draw() {
   } else {
     hAmp=lerp(hAmp,0,0.01);
   }
-  if (heartbeat.isPlaying()==false&&vOffset<-2000) {
+  if (heartbeat.isPlaying()==false&&vOffset<-8000) {
     heartbeat.loop();
   }
-  if (vOffset<-2000) {
+  if (vOffset<-8000) {
     hbAmp=lerp(hbAmp,1,0.5);
-  } else if (vOffset>-1000) {
+  } else {
     hbAmp=lerp(hbAmp,0,0.1);
   }
-  if (beat2.isPlaying()==false&&vOffset<-10000) {
+  if (beat2.isPlaying()==false&&vOffset<-12000) {
     beat2.amp(0.5);
     beat2.loop();
   }
-  if (vOffset<-10000) {
+  if (vOffset<-12000) {
     b2Amp=lerp(b2Amp,0.5,0.1);
   } else {
     b2Amp=lerp(b2Amp,0,0.01);
   }
-
   if (wind.isPlaying()==false&&vOffset>-100) {
     wind.loop();
   }
@@ -381,25 +426,51 @@ function draw() {
   } else {
     windAmp=lerp(windAmp,0,0.01);
   }
-  if (strings2.isPlaying()==false&&vOffset>2000) {
+  if (strings2.isPlaying()==false&&vOffset>13000) {
     strings2.loop();
   }
-  if (vOffset>2000) {
+  if (vOffset>13000) {
     str2Amp=lerp(str2Amp,1,0.1);
   } else {
     str2Amp=lerp(str2Amp,0,0.01);
   }
+  if (tension.isPlaying()==false&&vOffset>23000||tension.isPlaying()==false&&vOffset<-23000) {
+    tension.loop();
+  }
+  if (vOffset>23000||vOffset<-23000) {
+    tensAmp=lerp(tensAmp,0.9,0.1);
+  } else {
+    tensAmp=lerp(tensAmp,0,0.01);
+  }
+
+  if (wind2.isPlaying()==false) {
+    wind2.loop();
+  }
+  wind2.amp(speed*0.003);
+  wind2.rate(1.1);
+
   horror.amp(hAmp);
   horror3.amp(h3Amp);
   heartbeat.amp(hbAmp);
   beat2.amp(b2Amp);
+  tension.amp(tensAmp);
 
   wind.amp(windAmp);
   strings2.amp(str2Amp);
-  }
+} else {
+  horror3.stop();
+  horror.stop();
+  heartbeat.stop();
+  beat2.stop();
+  wind.stop();
+  strings2.stop();
+  wind2.stop();
+  tensAmp=lerp(tensAmp,0,0.01);
+  tension.amp(tensAmp);
+}
 
   //***POST-PROCESSING***//
-  if (vOffset > -100) {
+  if (vOffset > -5000) {
     postPro = false;
   } else {
     postPro = true;
@@ -438,7 +509,7 @@ function draw() {
     rect(0, 0, width, height);
     pop();
   }
-  if (vOffset>3000) {
+  if (vOffset>7000) {
     topPostPro=lerp(topPostPro,255,0.05);
   } else {
     topPostPro=lerp(topPostPro,0,0.05);
@@ -450,11 +521,17 @@ function draw() {
   noStroke();
   rect(0,0,width,height);
   pop();
-
-  if(vOffset<-27000||vOffset>27000) {
-    vOffset=0;
-    speed=0;
+  if(gameState==0) {
+    push();
+    fill(0,0.9);
+    noStroke();
+    rect(0,0,width,height);
+    fill(255);
+    textAlign(LEFT);
+    text("Press Space to start.",100,100);
+    pop();
   }
+
 }
 
 function windowResized() {

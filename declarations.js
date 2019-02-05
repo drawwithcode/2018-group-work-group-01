@@ -1,4 +1,10 @@
-let hbAmp=hAmp=h3Amp=windAmp=str2Amp=b2Amp=0;
+//GAME STATE. 0=Game paused; 1= game started (phase 1); 2= phase 2; 3 = phase 3.
+let gameState=0
+
+
+//audio vars.
+let enableSound=0;
+let hbAmp=hAmp=h3Amp=windAmp=wind2Amp=str2Amp=b2Amp=tensAmp=0;
 
 let randomPos = [];
 
@@ -13,14 +19,18 @@ var bubbles = [];
 //kaleidoscope vars
 const slices = 12;
 let shape, mask, img;
+let kalSize, offScreen;
+let kalAlpha = 0;
 
 
 //Lati verticali del box principale, parametrici, e padding in alto e basso.
 let meterWidth=25;
+let meterPos=-70;
 const padding = 40;
-let mainLSide = meterWidth+padding+padding*.75;
-let mainRSide = 750;
-let sidePanelWidth = 450;
+let mainLSide = padding;
+let mainRSide = 900;
+let sidePanelWidth = 650;
+let sidePanelPos;
 
 //Variabili per il noise che uso per variare certe trasformazioni.
 var hNoise, vNoise;
@@ -52,19 +62,8 @@ let gravity = 0.04;
 //0: not splashing. 1: splash up. 2: splash down.
 let splashState = 0;
 let splashAmount = 0;
-let allowSound = 1;
+let allowSplashSound = 1;
 let splashSpeed = 0;
-
-let now=then=0;
-
-//kaleido vars
-let kalSize, offScreen;
-let kalAlpha = 0;
-
-let topPostPro=0;
-
-//for red post-processing near fail areas.
-let failApproach=0;
 
 // Organs image
 var outline;
@@ -85,7 +84,16 @@ var heart;
 var intestines;
 var muscle;
 
-function bottomFailArea() {
+let now=then=0;
+
+
+
+let topPostPro=0;
+
+//for red post-processing near fail areas.
+let failApproach=0;
+
+function bottomFailArea(DEPTH) {
   let img = createImage(66, 66);
   img.loadPixels();
   for (let i = 0; i < img.width; i++) {
@@ -94,17 +102,18 @@ function bottomFailArea() {
     }
   }
   img.updatePixels();
-  let depth = 27000;
-  let topPos = cullPoint(padding+depth+vOffset);
-  let gradTopPos = cullPoint(padding+depth+vOffset-2000);
-  let bottomPos = cullPoint(height*2+padding+depth+vOffset);
+  let depth = DEPTH;
+  let topPos = cullPoint(depth+vOffset);
+  let gradTopPos = cullPoint(depth+vOffset-2000);
+  let bottomPos = cullPoint(height*2+depth+vOffset);
   if (topPos-gradTopPos>0) {
     image(img,mainLSide,gradTopPos,mainRSide-mainLSide,topPos-gradTopPos);
   }
   fill(255);
   rect(mainLSide,topPos,mainRSide-mainLSide,bottomPos-topPos);
+  return topPos;
 }
-function topFailArea() {
+function topFailArea(DEPTH) {
   let img = createImage(66, 66);
   img.loadPixels();
   for (let i = 0; i < img.width; i++) {
@@ -113,16 +122,17 @@ function topFailArea() {
     }
   }
   img.updatePixels();
-  let depth = -27000;
-  let topPos = cullPoint(padding+depth+vOffset);
-  let bottomPos = cullPoint(height*2+padding+depth+vOffset);
-  let gradBottomPos = cullPoint(height*2+padding+depth+vOffset+2000);
+  let depth = DEPTH;
+  let topPos = cullPoint(depth+vOffset);
+  let bottomPos = cullPoint(height*2+depth+vOffset);
+  let gradBottomPos = cullPoint(height*2+depth+vOffset+2000);
   if(gradBottomPos-bottomPos>0) {
     image(img,mainLSide,bottomPos,mainRSide-mainLSide,gradBottomPos-bottomPos);
   }
 
   fill(0);
   rect(mainLSide,topPos,mainRSide-mainLSide,bottomPos-topPos);
+  return bottomPos;
 }
 
 
@@ -254,29 +264,93 @@ function cullPoint(INPUT) {
 function calcSpeed(DELTA,SPEED) {
   return (SPEED*DELTA)*0.06;
 }
-let jumpStrength=10;
-let jumpAmount=40;
+
+let jumpAmount=30;
 function keyPressed() {
   if (keyCode===32) {
-    if (jumpAmount>2) {
-      jumpAmount*=0.95;
+    if (jumpAmount>0.7) {
+      jumpAmount*=0.80;
     }
     let offsetJump=jumpAmount;
     if (vOffset<200) {
       offsetJump=lerp(offsetJump,jumpAmount*0.8,0.1);
     }
-    now = millis();
-    delta = now - then;
-    vOffset += calcSpeed(delta,speed);
-    speed += calcSpeed(delta,-gravity);
-  if (speed < 0) {
-    impact.play();
-    speed += offsetJump;
-  } else {
-    impact.play();
-    speed += offsetJump;
+  impact.play();
+  speed += offsetJump;
   }
-  then = now;
+}
+
+// ORGANO
+
+// Keycode of corresponding letter, x, y, width and height from left and top of image, time of treatment in milliseconds
+function Organ(_keyCode,_xFromSide,_yFromTop,_width,_height,_treatmentTime) {
+
+  // Hardcoded properties
+  this.symptomStage = 0;
+  this.startOfTreatment;
+  this.treatmentStage = 0;
+
+
+  // Methods
+  this.display = function() {
+
+    x = _xFromSide - _width/2 + mainRSide - mainLSide + padding * 3;
+    y = height - padding - sidePanelWidth*outline.height/outline.width + _yFromTop;
+
+    // Rectangle
+    blendMode(BLEND);
+    fill(bgBrightness);
+    strokeWeight(1);
+    stroke(255-bgBrightness);
+    rect(x,y,_width,_height);
+
+    // Text
+    textFont("Noto Serif");
+    textAlign(CENTER);
+    textSize(Math.round(_width * 0.7));
+    textStyle(BOLD);
+    fill(255-bgBrightness);
+    noStroke();
+    text(String.fromCharCode(_keyCode), x+(_width/2), y+(_height/2)+2);
+
+    if (keyIsDown(_keyCode)) {
+      if (this.startOfTreatment == null) {
+        this.startOfTreatment = millis();
+      }
+      stroke(255-bgBrightness);
+      strokeWeight(5);
+      var quarterTreatmentProgress = (millis()-this.startOfTreatment)/(_treatmentTime/4);
+      if (this.treatmentStage == 0) {
+        line(x,y+_height,x,y+_height-_height*quarterTreatmentProgress);
+        if (quarterTreatmentProgress >= 1) {
+          this.treatmentStage = 1;
+        }
+      } else if (this.treatmentStage == 1) {
+        line(x,y+_height,x,y);
+        line(x,y,x+_width*(quarterTreatmentProgress-1),y);
+        if (quarterTreatmentProgress >= 2) {
+          this.treatmentStage = 2;
+        }
+      } else if (this.treatmentStage == 2) {
+        line(x,y+_height,x,y);
+        line(x,y,x+_width,y);
+        line(x+_width,y,x+_width,y+_height*(quarterTreatmentProgress-2));
+        if (quarterTreatmentProgress >= 3) {
+          this.treatmentStage = 3;
+        }
+      } else if (this.treatmentStage == 3) {
+        line(x,y+_height,x,y);
+        line(x,y,x+_width,y);
+        line(x+_width,y,x+_width,y+_height);
+        line(x+_width,y+_height,x+_width-_width*(quarterTreatmentProgress-3),y+_height);
+        if (quarterTreatmentProgress >= 4) {
+          this.treatmentStage = null;
+        }
+      }
+    } else {
+      this.treatmentStage = 0;
+      this.startOfTreatment = null;
+    }
   }
 }
 
