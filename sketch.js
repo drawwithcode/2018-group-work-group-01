@@ -553,7 +553,6 @@ function draw() {
   if (gameState==0) {
     fail.partTwo();
   }
-  vOffset=0;
 }
 
 function windowResized() {

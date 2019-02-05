@@ -1,5 +1,5 @@
 //GAME STATE. -1=Title screen; 0=Game paused; 1= game started (phase 1); 2= phase 2; 3 = phase 3.
-let gameState = 2;
+let gameState = -1;
 
 
 //audio vars.
@@ -347,7 +347,6 @@ function Organ(_keyCode, _xFromSide, _yFromTop, _width, _height, _symptoms, _xFr
   this.symptomTextSize = 16;
   this.arrowMargin = 30;
 
-
   // Methods
   this.display = function() {
 
@@ -356,6 +355,13 @@ function Organ(_keyCode, _xFromSide, _yFromTop, _width, _height, _symptoms, _xFr
     xText = _xFromSideText - _width / 2 + mainRSide - mainLSide + padding * 3;
     yText = height - padding - sidePanelWidth * outline.height / outline.width + _yFromTopText;
 
+    // Rectangle
+    blendMode(NORMAL);
+    fill(0);
+    strokeWeight(1);
+    stroke(255);
+    rect(x, y, _width, _height);
+
     // Letter
     textFont("Noto Serif");
     textAlign(CENTER);
@@ -363,7 +369,7 @@ function Organ(_keyCode, _xFromSide, _yFromTop, _width, _height, _symptoms, _xFr
     textStyle(BOLD);
     fill(255);
     noStroke();
-    text(String.fromCharCode(_keyCode), x + (_width / 2), y + (_height / 2) + 2);
+    text(String.fromCharCode(_keyCode), x+_width/2, y+_height/1.3);
 
     // Symptom Text
     if (this.symptoms["one"] != null) {
@@ -391,9 +397,44 @@ function Organ(_keyCode, _xFromSide, _yFromTop, _width, _height, _symptoms, _xFr
       if (this.startOfTreatment == null) {
         this.startOfTreatment = millis();
       }
+      stroke(255);
+      strokeWeight(5);
+      var quarterTreatmentProgress = (millis() - this.startOfTreatment) / (_treatmentTime / 4);
+      if (this.treatmentStage == 0) {
+        line(x, y + _height, x, y + _height - _height * quarterTreatmentProgress);
+        if (quarterTreatmentProgress >= 1) {
+          this.treatmentStage = 1;
+        }
+      } else if (this.treatmentStage == 1) {
+        line(x, y + _height, x, y);
+        line(x, y, x + _width * (quarterTreatmentProgress - 1), y);
+        if (quarterTreatmentProgress >= 2) {
+          this.treatmentStage = 2;
+        }
+      } else if (this.treatmentStage == 2) {
+        line(x, y + _height, x, y);
+        line(x, y, x + _width, y);
+        line(x + _width, y, x + _width, y + _height * (quarterTreatmentProgress - 2));
+        if (quarterTreatmentProgress >= 3) {
+          this.treatmentStage = 3;
+        }
+      } else if (this.treatmentStage == 3) {
+        line(x, y + _height, x, y);
+        line(x, y, x + _width, y);
+        line(x + _width, y, x + _width, y + _height);
+        line(x + _width, y + _height, x + _width - _width * (quarterTreatmentProgress - 3), y + _height);
+        if (quarterTreatmentProgress >= 4) {
+          this.treatmentStage = null;
+        }
+      }
+    } else {
+      this.treatmentStage = 0;
+      this.startOfTreatment = null;
     }
   }
 }
+
+
 
 
 //Title screen, story and failure screens.
