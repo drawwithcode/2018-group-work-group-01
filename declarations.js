@@ -354,7 +354,8 @@ function Organ(_keyCode,_xFromSide,_yFromTop,_width,_height,_treatmentTime) {
   }
 }
 
-<<<<<<< HEAD
+
+
 function titleScreen() {
   push();
   //cornice
@@ -607,7 +608,7 @@ function failScreen() {
 let canPressMouse=1;
 function mouseReleased() {
   canPressMouse=1;
-=======
+}
 // ORGANO
 
 // Keycode of corresponding letter, x, y, width and height from left and top of image, time of treatment in milliseconds
@@ -679,5 +680,4 @@ function Organ(_keyCode,_xFromSide,_yFromTop,_width,_height,_treatmentTime) {
       this.startOfTreatment = null;
     }
   }
->>>>>>> 010d61a02658df38f7b720313f33974ce10b1460
 }
