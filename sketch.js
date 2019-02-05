@@ -64,6 +64,33 @@ function setup() {
   muscle = new Organ(66,190,300,40,40,muscleSymptoms,190,200,5000); //B
   organs.push(brain,lungs,veins,skin,heart,intestines,muscle);
 
+  setTimeout(function() {
+    for (var i = 0; i < organs.length; i++) {
+      setSymptom(organs[i], 1, int(random(0, 7000)));
+    }
+    setInterval(increaseLevel, 2000);
+  }, 2000);
+}
+
+function increaseLevel() {
+  var curedOrgans = 0;
+  var currentLevel = 0;
+  for (var i = 0; i < organs.length; i++) {
+    if (organs[i].symptomStage == organs[i].treatedSymptomsStage) {
+      curedOrgans++;
+    }
+    if (organs[i].treatedSymptomsStage > currentLevel) {
+      currentLevel = organs[i].treatedSymptomsStage;
+    }
+  }
+
+  if (curedOrgans == organs.length) {
+    for (var i = 0; i < organs.length; i++) {
+      if (currentLevel + 1 < 4) {
+        setSymptom(organs[i], currentLevel + 1, int(random(0, 7000)));
+      }
+    }
+  }
 }
 
 

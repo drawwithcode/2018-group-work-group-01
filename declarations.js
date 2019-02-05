@@ -1,5 +1,5 @@
 //GAME STATE. -1=Title screen; 0=Game paused; 1= game started (phase 1); 2= phase 2; 3 = phase 3.
-let gameState = -1;
+let gameState = 2;
 
 
 //audio vars.
@@ -335,14 +335,27 @@ function keyReleased() {
 
 // ORGANO
 
+function setSymptom(_organ, _symptomStage, _delay) {
+  if ((_symptomStage == 1 && _organ.symptoms["one"] == null) ||
+      (_symptomStage == 2 && _organ.symptoms["two"] == null) ||
+      (_symptomStage == 3 && _organ.symptoms["three"] == null)) {
+    return;
+  }
+  setTimeout(function() {
+    _organ.symptomStage = _symptomStage
+  }, _delay);
+}
+
 // Keycode of corresponding letter, x and y from left and top of image, width, height, symptom lits, x and y of symptom text, time of treatment in milliseconds
 function Organ(_keyCode, _xFromSide, _yFromTop, _width, _height, _symptoms, _xFromSideText, _yFromTopText, _treatmentTime) {
 
   // Hardcoded properties
   this.symptomStage = 0;
+  this.treatedSymptomsStage = 0;
   this.symptoms = _symptoms;
+
   this.startOfTreatment;
-  this.treatmentStage = 0;
+  this.treatmentStage = 0; // Not to be confused with this.treatedSymptomsStage. I know, I'm sorry
 
   this.symptomTextSize = 16;
   this.arrowMargin = 30;
@@ -372,11 +385,21 @@ function Organ(_keyCode, _xFromSide, _yFromTop, _width, _height, _symptoms, _xFr
     text(String.fromCharCode(_keyCode), x+_width/2, y+_height/1.3);
 
     // Symptom Text
-    if (this.symptoms["one"] != null) {
+    if (this.symptomStage != this.treatedSymptomsStage) {
+      blendMode(DIFFERENCE);
       textSize(this.symptomTextSize);
       textStyle(NORMAL);
-      text(this.symptoms["one"], xText, yText);
-      blendMode(DIFFERENCE);
+      switch (this.symptomStage) {
+        case 1:
+          text(this.symptoms["one"], xText, yText);
+          break;
+        case 2:
+          text(this.symptoms["two"], xText, yText);
+          break;
+        default:
+          text(this.symptoms["three"], xText, yText);
+      }
+
       stroke(1);
       stroke(255);
       var angle = atan((y + _height / 2 - yText) / (x + _width / 2 - xText));
@@ -391,9 +414,11 @@ function Organ(_keyCode, _xFromSide, _yFromTop, _width, _height, _symptoms, _xFr
       }
     }
 
-    blendMode(NORMAL);
-
     if (keyIsDown(_keyCode)) {
+      if (this.treatedSymptomsStage == this.symptomStage) {
+        return;
+      }
+
       if (this.startOfTreatment == null) {
         this.startOfTreatment = millis();
       }
@@ -425,12 +450,14 @@ function Organ(_keyCode, _xFromSide, _yFromTop, _width, _height, _symptoms, _xFr
         line(x + _width, y + _height, x + _width - _width * (quarterTreatmentProgress - 3), y + _height);
         if (quarterTreatmentProgress >= 4) {
           this.treatmentStage = null;
+          this.treatedSymptomsStage++;
         }
       }
     } else {
       this.treatmentStage = 0;
       this.startOfTreatment = null;
     }
+    blendMode(NORMAL);
   }
 }
 
