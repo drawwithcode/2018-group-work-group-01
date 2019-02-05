@@ -1,4 +1,4 @@
-# Cold Turkey
+![Banner](readme/banner.png)<br>
 
 ## About
 Cold Turkey is a web experience built on [p5.js](https://p5js.org) with the aim of exploring the tolls and symptoms of heroin addiction.<br>
@@ -8,12 +8,13 @@ Cold Turkey was developed as a part of the Creative Coding course at Politecnico
 1. [Project Idea](#project-idea)
 2. [Interaction](#interaction)
 3. [Key Features](#key-features)<br>
-a. [Multiple tiling windows](#multiple-tiling-windows)<br>
-b. [Vertical scrolling with culling](#vertical-scrolling-with-culling)<br>
-c. [Animated waves and splash](#animated-waves-and-splash)<br>
-d. [Time-based movement](#time-based-movement)<br>
-e. [Kaleidoscope effect](#kaleidoscope-effect)<br>
-f. [Post-processing and blending modes](#post-processing-and-blending-modes)<br>
+a. [Twine-style opening](#twine-style-opening)<br>
+b. [Multiple tiling windows](#multiple-tiling-windows)<br>
+c. [Vertical scrolling with culling](#vertical-scrolling-with-culling)<br>
+d. [Animated waves and splash](#animated-waves-and-splash)<br>
+e. [Time-based movement](#time-based-movement)<br>
+f. [Kaleidoscope effect](#kaleidoscope-effect)<br>
+g. [Post-processing and blending modes](#post-processing-and-blending-modes)<br>
 4. [Team](#team)
 
 ## Project Idea
@@ -25,11 +26,15 @@ The experience is designed to be played on a computer, as interaction revolves a
 
 ## Key Features
 We hereby present some of the most noteworthy features of our project.
+#### Twine-style opening
+![Twine](readme/twine.gif)<br>
+To provide context and immerse the player in the experience, we use a short story requiring a minimum of interactivity to present a possible scenario where drug addiction can start. This story reaches its conclusion in one of the three possible endings the player can reach, two of which result from failure to complete the experience.<br>
+This format is a simplified version of a [Twine](http://twinery.org/) story.
 #### Multiple tiling windows
 The screen is, at any moment, divided in up to three windows.
-The central window is the most important: it offers a vertically scrolling view of the player's depth, in a sort of a zoomed-in state.
+The central window is the most important: it offers a vertically scrolling view of the player's depth, in a sort of a zoomed-in state.<br>
 The left window is a height meter which shows the player's total depth compared to the world.
-The right window illustrates the symptoms of drug consumption over the user's body and the keyboard keys the player is required to press.
+The right window illustrates the symptoms of drug consumption over the user's body and the keyboard keys the player is required to press.<br>
 The central window is the only one which is visible from the start, where it occupies the entire screen. Its width changes dynamically to accomodate the other two, at each side of the screen.
 
 ```javascript
