@@ -14,6 +14,16 @@ function preload() {
   tension = loadSound("./sounds/tension.mp3");
 
   kaleido = loadImage("./images/kaleido.png");
+
+  //organ display
+  outline = loadImage("./images/body-outline.png");
+  brainImage = loadImage("./images/brain.png");
+  lungsImage = loadImage("./images/lungs.png");
+  veinsImage = loadImage("./images/veins.png");
+  skinImage = loadImage("./images/skin.png");
+  heartImage = loadImage("./images/heart.png");
+  intestinesImage = loadImage("./images/intestines.png");
+  muscleImage = loadImage("./images/muscle.png");
 }
 
 
@@ -44,6 +54,16 @@ function setup() {
   //needed for kaleidoscope
   shape = calcStuff(width,height,slices);
   mask = createMask(shape.a,shape.o);
+  //organs
+  //_keyCode,_xFromSide,_yFromTop,_width,_height,_treatmentTime
+  brain = new Organ(69,225,60,40,40,5000); //E
+  lungs = new Organ(83,280,250,40,40,5000); //S
+  veins = new Organ(70,350,280,40,40,5000); //F
+  skin = new Organ(78,50,450,40,40,5000); //N
+  heart = new Organ(77,235,330,40,40,5000); //M
+  intestines = new Organ(75,225,440,40,40,5000); //K
+  muscle = new Organ(66,90,260,40,40,5000); //B
+
 }
 
 
@@ -59,6 +79,7 @@ function draw() {
     mainRSide=width-padding;
     center.y=height/2;
     enableSound=0;
+    sidePanelPos=width+padding;
     if (keyIsDown(32)) {
       gameState=1;
       speed+=jumpAmount;
@@ -69,12 +90,14 @@ function draw() {
   if (gameState==1&&jumpAmount<28) {
     meterPos=lerp(meterPos,0,0.02);
     mainLSide=lerp(mainLSide, padding+meterWidth+padding*.75,0.02);
+    sidePanelPos=width+padding;
     if (jumpAmount<2) {
       gameState=2;
     }
   }
   if (gameState==2) {
-    mainRSide=lerp(mainRSide,width-padding*1.75-500,0.02);
+    mainRSide=lerp(mainRSide,width-padding*1.75-sidePanelWidth,0.02);
+    sidePanelPos=(mainRSide+padding*.75);
   }
   if((height-center.y)>26150-vOffset||(height-center.y)<-26300-vOffset) {
     gameState=0;
@@ -162,6 +185,11 @@ function draw() {
   fill(0);
   stroke(255);
   rect(mainLSide, padding, mainRSide - mainLSide, height - padding * 2);
+  push();
+  noFill();
+  blendMode(DIFFERENCE);
+  rect(sidePanelPos, padding, sidePanelWidth, height - padding * 2);
+  pop();
 
 
   //***MARE-CIELO***
@@ -330,6 +358,30 @@ function draw() {
 
 
   //*** INDICATORE SINTOMI***//
+  push();
+  blendMode(DIFFERENCE);
+  var imageX = mainRSide - mainLSide + padding * 3;
+  var imageY = height - padding - sidePanelWidth*outline.height/outline.width;
+  var imageHeight = sidePanelWidth*outline.height/outline.width;
+  image(outline,imageX, imageY, sidePanelWidth, imageHeight);
+  image(brainImage,imageX, imageY, sidePanelWidth, imageHeight);
+  image(lungsImage,imageX, imageY, sidePanelWidth, imageHeight);
+  image(veinsImage,imageX, imageY, sidePanelWidth, imageHeight);
+  image(skinImage,imageX, imageY, sidePanelWidth, imageHeight);
+  image(heartImage,imageX, imageY, sidePanelWidth, imageHeight);
+  image(intestinesImage,imageX, imageY, sidePanelWidth, imageHeight);
+  image(muscleImage,imageX, imageY, sidePanelWidth, imageHeight);
+  brain.display();
+  lungs.display();
+  veins.display();
+  skin.display();
+  heart.display();
+  intestines.display();
+  muscle.display();
+  pop();
+
+  strokeWeight(1);
+  textSize(20);
 
   //***AMBIENT SOUNDS***//
   if (enableSound) {
@@ -418,7 +470,7 @@ function draw() {
 }
 
   //***POST-PROCESSING***//
-  if (vOffset > -1000) {
+  if (vOffset > -5000) {
     postPro = false;
   } else {
     postPro = true;
