@@ -71,14 +71,16 @@ function draw() {
   center.y = limitValue(center.y, padding*3, height-padding*3);
   //***GAME STATE***//
   if (gameState<1) {
+    timesJumped=0;
     vOffset=-200;
     speed=0;
-    jumpAmount=28;
+    jumpAmount=32;
     mainRSide=width-padding;
     center.y=height/2;
     enableSound=0;
     sidePanelPos=width+padding;
-    if (keyIsDown(32)) {
+    if (keyIsDown(32)&&canPressSpace) {
+      canPressSpace=0;
       gameState=1;
       speed+=jumpAmount;
       inception.play();
@@ -86,7 +88,7 @@ function draw() {
   } else {
     enableSound=1;
   }
-  if (gameState==1&&jumpAmount<28) {
+  if (gameState==1&&jumpAmount<32) {
     meterPos=lerp(meterPos,0,0.02);
     mainLSide=lerp(mainLSide, padding+meterWidth+padding*.75,0.02);
     sidePanelPos=width+padding;
@@ -98,7 +100,15 @@ function draw() {
     mainRSide=lerp(mainRSide,width-padding*1.75-sidePanelWidth,0.02);
     sidePanelPos=(mainRSide+padding*.75);
   }
-  if((height-center.y)>26150-vOffset||(height-center.y)<-26300-vOffset) {
+  let topFailIncrease=13000*(timesJumped-5)/30;
+  if (topFailIncrease>13000) {
+    topFailIncrease=13000;
+  }
+  let topMeterIncrease=138*(timesJumped-5)/30;
+  if (topMeterIncrease>138) {
+    topMeterIncrease=138;
+  }
+  if((height-center.y)>(26150-topFailIncrease)-vOffset||(height-center.y)<-(26300)-vOffset) {
     gameState=0;
     if(inception.isPlaying()==false) {
       inception.play();
@@ -176,7 +186,7 @@ function draw() {
   avatarOff = lerp(avatarOff, speed * 10, 0.05) + cos(millis()*0.06 / 30);
   noiseSpeed = 0.2;
   noiseAmount = mapVar * 30;
-  if (vOffset<-25000||vOffset>24000) {
+  if (vOffset<-25000+topFailIncrease||vOffset>24000) {
     noiseSpeed =0.4;
     noiseAmount=50;
   }
@@ -226,7 +236,7 @@ function draw() {
 
   //FAIL AREAS
   bottomFailArea(27000);
-  topFailArea(-27000);
+  topFailArea(-27000+topFailIncrease);
 
   //SPLASH
   blendMode(MULTIPLY);
@@ -356,7 +366,7 @@ function draw() {
   blendMode(DIFFERENCE);
   rect(padding,height/2,meterWidth,height/2-padding);
   pop();
-  bottomFail = new failArea(padding,padding,meterWidth,(height-padding*2)*0.18);
+  topFail = new failArea(padding,padding,meterWidth,(height-padding*2)*0.18+topMeterIncrease);
   bottomFail = new failArea(padding,height-padding-(height-padding*2)*0.18,meterWidth,(height-padding*2)*0.18);
   blendMode(BLEND);
   stroke(255-bgBrightness);
@@ -441,10 +451,10 @@ function draw() {
   } else {
     str2Amp=lerp(str2Amp,0,0.01);
   }
-  if (tension.isPlaying()==false&&vOffset>23000||tension.isPlaying()==false&&vOffset<-23000) {
+  if (tension.isPlaying()==false&&vOffset>23000-topFailIncrease||tension.isPlaying()==false&&vOffset<-23000) {
     tension.loop();
   }
-  if (vOffset>23000||vOffset<-23000) {
+  if (vOffset>23000-topFailIncrease||vOffset<-23000) {
     tensAmp=lerp(tensAmp,0.9,0.1);
   } else {
     tensAmp=lerp(tensAmp,0,0.01);

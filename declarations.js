@@ -265,11 +265,15 @@ function calcSpeed(DELTA,SPEED) {
   return (SPEED*DELTA)*0.06;
 }
 
+
 let jumpAmount=30;
+let timesJumped=0;
+let canPressSpace=1;
 function keyPressed() {
+  timesJumped++;
   if (keyCode===32) {
     if (jumpAmount>0.7) {
-      jumpAmount*=0.80;
+      jumpAmount*=0.85;
     }
     let offsetJump=jumpAmount;
     if (vOffset<200) {
@@ -277,6 +281,11 @@ function keyPressed() {
     }
   impact.play();
   speed += offsetJump;
+  }
+}
+function keyReleased() {
+  if (keyCode===32) {
+    canPressSpace=1;
   }
 }
 
