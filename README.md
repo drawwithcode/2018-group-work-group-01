@@ -60,7 +60,7 @@ function draw() {
 ```
 #### Vertical scrolling with culling
 ![Scrolling](readme/scroll.gif)<br>
-To simulate scrolling on the main window, we do not move the player avatar (to be precise, we move it partially according to its speed to offer some feedback); instead, we move all other elements vertically.<br>
+To simulate scrolling on the main window, we do not move the player avatar (to be precise, we move it partially according to its speed to simulate inertia); instead, we move all other elements vertically.<br>
 The variable `vOffset` controls all scrolling behaviour; it is an indicator of height. All elements that are meant to scroll are translated by this variable. <br>
 All of these are mapped to height and therefore will not be present on the screen at all times. For this reason, we *cull*, or hide, elements that are outside the window for performance reasons (otherwise, we would need to render 20 000 instances of text alone every frame). To prevent pop-in, we move points of larger objects, such as rectangles, to make them fit the window.
 ```javascript

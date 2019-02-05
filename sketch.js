@@ -30,8 +30,6 @@ function preload() {
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
   colorMode(HSB);
-  textSize(17);
-  textAlign(RIGHT, CENTER);
   strokeWeight(1);
   //prendo un po' di valori a caso che mi servono dopo per posizionare le linee cinetiche.
   for (i = topValue; i < bottomValue; i++) {
@@ -72,7 +70,7 @@ function draw() {
   center = createVector(mainLSide + (mainRSide - mainLSide) / 2, height / 2 + avatarOff);
   center.y = limitValue(center.y, padding*3, height-padding*3);
   //***GAME STATE***//
-  if (gameState==0) {
+  if (gameState<1) {
     vOffset=-200;
     speed=0;
     jumpAmount=28;
@@ -83,6 +81,7 @@ function draw() {
     if (keyIsDown(32)) {
       gameState=1;
       speed+=jumpAmount;
+      inception.play();
     }
   } else {
     enableSound=1;
@@ -103,6 +102,12 @@ function draw() {
     gameState=0;
     if(inception.isPlaying()==false) {
       inception.play();
+    }
+    if (vOffset>0) {
+      storySlide=5;
+    }
+    if (vOffset<0) {
+      storySlide=6;
     }
   }
   //Velocità calcolata SUL TEMPO, non su framerate.
@@ -323,6 +328,8 @@ function draw() {
       push();
       noStroke();
       fill(255);
+      textSize(17);
+      textAlign(RIGHT, CENTER);
       if (vPos < height - padding - 7 && vPos > padding + 7) {
         text(-i * 25, mainRSide - lineWidth - 10, vPos);
       }
@@ -469,8 +476,19 @@ function draw() {
   tension.amp(tensAmp);
 }
 
+  //***TITLE SCREEN***//
+  if(gameState==-1) {
+    mapVar=2;
+    title=new titleScreen();
+  }
+  if (gameState==0) {
+    mapVar=2;
+    fail=new failScreen();
+  }
+
+
   //***POST-PROCESSING***//
-  if (vOffset > -5000) {
+  if (vOffset > -5000 && gameState>0) {
     postPro = false;
   } else {
     postPro = true;
@@ -521,15 +539,11 @@ function draw() {
   noStroke();
   rect(0,0,width,height);
   pop();
-  if(gameState==0) {
-    push();
-    fill(0,0.9);
-    noStroke();
-    rect(0,0,width,height);
-    fill(255);
-    textAlign(LEFT);
-    text("Press Space to start.",100,100);
-    pop();
+  if(gameState==-1) {
+    title.partTwo();
+  }
+  if (gameState==0) {
+    fail.partTwo();
   }
 
 }

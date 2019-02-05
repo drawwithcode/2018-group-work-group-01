@@ -1,5 +1,5 @@
-//GAME STATE. 0=Game paused; 1= game started (phase 1); 2= phase 2; 3 = phase 3.
-let gameState=0
+//GAME STATE. -1=Title screen; 0=Game paused; 1= game started (phase 1); 2= phase 2; 3 = phase 3.
+let gameState=-1
 
 
 //audio vars.
@@ -352,4 +352,258 @@ function Organ(_keyCode,_xFromSide,_yFromTop,_width,_height,_treatmentTime) {
       this.startOfTreatment = null;
     }
   }
+}
+
+function titleScreen() {
+  push();
+  //cornice
+  rectMode(CORNER);
+  fill(0);
+  stroke(255);
+  rect(40,40,windowWidth-80,windowHeight-80);
+  push();
+  rectMode(CORNER);
+  var wUp = 400;
+  var hUp = 125;
+  var xUp = windowWidth/2 - 200 ;
+  var yUp = windowHeight/2 - 62.5 ;
+  var max_xUp = xUp + wUp;
+  var max_yUp = yUp + hUp;
+  let fillUp = 0;
+  let fillDown = 0;
+  let fillText = 0;
+  let strokeUp = 0;
+  let strokeDown = 0;
+  let clickOffset=0;
+  if(mouseX > xUp - 25 && mouseX < max_xUp && mouseY > yUp - 25 && mouseY < max_yUp) {
+    fillUp = 0;
+    strokeUp = 255;
+    fillDown = 255;
+    strokeDown = 0;
+    fillText = 0;
+    cursor('pointer');
+    if (mouseIsPressed&&canPressMouse) {
+      clickOffset=7;
+      setTimeout(function(){gameState=0;cursor('auto');},200);
+
+    }
+  } else {
+    fillUp = 255;
+    strokeUp = 255;
+    fillDown = 0;
+    strokeDown = 255;
+    fillText = 255;
+    cursor('auto');
+  }
+  //rettangolo sopra
+  fill(fillUp);
+  rect(xUp,yUp,wUp,hUp);
+  //rettangolo sotto
+  fill(fillDown);
+  rect(xUp - 25+clickOffset, yUp - 25+clickOffset, wUp, hUp);
+  //testo
+  this.partTwo = function() {
+    push();
+    textFont('EB Garamond');
+    noStroke();
+    textSize(60);
+    textAlign(CENTER);
+    fill(fillText);
+    text('Cold Turkey', windowWidth/2 - 27+clickOffset, windowHeight/2+clickOffset);
+    pop();
+  }
+  pop();
+}
+let storySlide=1;
+function failScreen() {
+  push();
+  let fillSb = 0;
+  let fillTx = 0;
+  let strokeSb = 0;
+  let strokeTx = 0;
+  var wSb = 324;
+  var hSb = 64;
+  var xSb = windowWidth/2 - 162;
+  var ySb = windowHeight/2 + 118;
+  //boundaries
+  var max_xSb = xSb + wSb;
+  var max_ySb = ySb + hSb;
+  // put drawing code here
+  background(0);
+  //glitch
+  push();
+  //cornice
+  rectMode(CORNER);
+  fill(0);
+  stroke(255);
+  rect(40,40,windowWidth-80,windowHeight-80);
+  textFont('EB Garamond');
+  noStroke();
+  textSize(60);
+  textAlign(CENTER);
+  fill(255);
+  if (storySlide<5) {
+    text(storySlide+'.', windowWidth/2, windowHeight/2 - 100);
+  }
+  if (storySlide==5) {
+    text("Overdose", windowWidth/2, windowHeight/2 - 100);
+  }
+  if (storySlide==6) {
+    text("Abstinence", windowWidth/2, windowHeight/2 - 100);
+  }
+  if (storySlide==7) {
+    text("Cold Turkey", windowWidth/2, windowHeight/2 - 100);
+  }
+  //spacebar
+  pop();
+  textAlign(CENTER);
+  textFont('Raleway');
+  textSize(17);
+  fill(255);
+  if (storySlide==1) {
+    text('You pick it up.', windowWidth/2, windowHeight/2 + 45);
+    stroke(255);
+    line(windowWidth/2-55, windowHeight/2 + 50,windowWidth/2+55, windowHeight/2 + 50)
+    if (mouseX<width/2+55&&mouseX>width/2-55&&mouseY<height/2+55&&mouseY>height/2+25) {
+      cursor('pointer');
+      if (mouseIsPressed&&canPressMouse) {
+        storySlide=2;
+        canPressMouse=0;
+        cursor('auto');
+      }
+    } else {
+      cursor('auto');
+    }
+  }
+  if (storySlide==2) {
+    text('You say yes.', windowWidth/2, windowHeight/2 + 45);
+    stroke(255);
+    line(windowWidth/2-45, windowHeight/2 + 50,windowWidth/2+45, windowHeight/2 + 50)
+    if (mouseX<width/2+45&&mouseX>width/2-45&&mouseY<height/2+55&&mouseY>height/2+25) {
+      cursor('pointer');
+      if (mouseIsPressed&&canPressMouse) {
+        storySlide=3;
+        canPressMouse=0;
+        cursor('auto');
+      }
+    } else {
+      cursor('auto');
+    }
+  }
+  if (storySlide==3) {
+    text('You make small talk.', windowWidth/2, windowHeight/2 + 45);
+    stroke(255);
+    line(windowWidth/2-80, windowHeight/2 + 50,windowWidth/2+80, windowHeight/2 + 50)
+    if (mouseX<width/2+80&&mouseX>width/2-80&&mouseY<height/2+55&&mouseY>height/2+25) {
+      cursor('pointer');
+      if (mouseIsPressed&&canPressMouse) {
+        storySlide=4;
+        canPressMouse=0;
+        cursor('auto');
+      }
+    } else {
+      cursor('auto');
+    }
+  }
+  if (storySlide==4) {
+    text('Press          Space          to accept.', windowWidth/2, windowHeight/2 + 70);
+    stroke(255);
+    noFill();
+    rect(windowWidth/2-70,windowHeight/2+50,106,30);
+  }
+  if (storySlide==5) {
+    text('That was a mistake.', windowWidth/2, windowHeight/2 + 70);
+    stroke(255);
+    line(windowWidth/2-78, windowHeight/2 + 75,windowWidth/2+78, windowHeight/2 + 75)
+    if (mouseX<width/2+78&&mouseX>width/2-78&&mouseY<height/2+80&&mouseY>height/2+50) {
+      cursor('pointer');
+      if (mouseIsPressed&&canPressMouse) {
+        storySlide=4;
+        canPressMouse=0;
+        cursor('auto');
+      }
+    } else {
+      cursor('auto');
+    }
+  }
+  if (storySlide==6) {
+    text("There's no point in living anymore.", windowWidth/2, windowHeight/2 + 70);
+    stroke(255);
+    line(windowWidth/2-130, windowHeight/2 + 75,windowWidth/2+130, windowHeight/2 + 75)
+    if (mouseX<width/2+130&&mouseX>width/2-130&&mouseY<height/2+80&&mouseY>height/2+50) {
+      cursor('pointer');
+      if (mouseIsPressed&&canPressMouse) {
+        storySlide=4;
+        canPressMouse=0;
+        cursor('auto');
+      }
+    } else {
+      cursor('auto');
+    }
+  }
+  if (storySlide==7) {
+    text("You start to enjoy life again.", windowWidth/2, windowHeight/2 + 70);
+    stroke(255);
+    line(windowWidth/2-105, windowHeight/2 + 75,windowWidth/2+105, windowHeight/2 + 75)
+    if (mouseX<width/2+105&&mouseX>width/2-105&&mouseY<height/2+80&&mouseY>height/2+50) {
+      cursor('pointer');
+      if (mouseIsPressed&&canPressMouse) {
+        storySlide=1;
+        gameState=-1;
+        canPressMouse=0;
+        cursor('auto');
+      }
+    } else {
+      cursor('auto');
+    }
+  }
+
+
+  this.partTwo = function() {
+    push();
+    textFont('Raleway');
+    textSize(17);
+    fill(255);
+    textAlign(CENTER);
+    noStroke();
+    if (storySlide==1) {
+      text("It's late at night. You're at home, bored. Mom is sleeping.", windowWidth/2, windowHeight/2 - 25);
+      text('Your phone chimes.', windowWidth/2, windowHeight/2);
+    }
+    if (storySlide==2) {
+      text("It's your older friend calling you. He wants to come pick you up to hang out.", windowWidth/2, windowHeight/2 - 25);
+      text("He asks if you're free.", windowWidth/2, windowHeight/2);
+    }
+    if (storySlide==3) {
+      text("You sneak out of your house and get in the car with a bunch of other guys.", windowWidth/2, windowHeight/2 - 25);
+      text("It's chilly out.", windowWidth/2, windowHeight/2);
+    }
+    if (storySlide==4) {
+      text("The guy in the driving seat makes a stop at a deserted parking lot.", windowWidth/2, windowHeight/2 - 25);
+      text("You see another take out syringes. It's heroin.", windowWidth/2, windowHeight/2);
+      text("They offer you some, just a taste.", windowWidth/2, windowHeight/2+25);
+    }
+    if (storySlide==5) {
+      text("After hanging out with that same group more times,", windowWidth/2, windowHeight/2 - 25);
+      text("you start to notice that the effect of the drug is wearing off faster and faster.", windowWidth/2, windowHeight/2);
+      text("You increase your dose.", windowWidth/2, windowHeight/2+25);
+    }
+    if (storySlide==6) {
+      text("Your friends tell you off when you try to score some for free.", windowWidth/2, windowHeight/2 - 25);
+      text("You're broke and have no way to get any more.", windowWidth/2, windowHeight/2);
+      text("After a week, the symptoms get really severe and there's nothing you can do about it.", windowWidth/2, windowHeight/2+25);
+    }
+    if (storySlide==7) {
+      text("You get treatment. You fight your symptoms tooth and nail.", windowWidth/2, windowHeight/2 - 25);
+      text("You know you're not out of danger and that your life may be permanently scarred,", windowWidth/2, windowHeight/2);
+      text("but you manage to finally restore some balance to your world.", windowWidth/2, windowHeight/2+25);
+    }
+
+    pop();
+  }
+  pop();
+}
+let canPressMouse=1;
+function mouseReleased() {
+  canPressMouse=1;
 }
