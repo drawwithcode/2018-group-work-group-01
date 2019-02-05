@@ -11,8 +11,16 @@ function preload() {
   beat2 = loadSound("./sounds/blood.mp3");
 
   kaleido = loadImage("./images/kaleido.png");
-  gradient = loadImage("./images/gradient.png");
-  gradient2 = loadImage("./images/gradient2.png");
+  //gradient = loadImage("./images/gradient.png");
+  //gradient2 = loadImage("./images/gradient2.png");
+  outline = loadImage("./images/body-outline.png");
+  brainImage = loadImage("./images/brain.png");
+  lungsImage = loadImage("./images/lungs.png");
+  veinsImage = loadImage("./images/veins.png");
+  skinImage = loadImage("./images/skin.png");
+  heartImage = loadImage("./images/heart.png");
+  intestinesImage = loadImage("./images/intestines.png");
+  muscleImage = loadImage("./images/muscle.png");
 }
 
 
@@ -43,6 +51,14 @@ function setup() {
   //needed for kaleidoscope
   shape = calcStuff(width,height,slices);
   mask = createMask(shape.a,shape.o);
+
+  brain = new Organ(69,225,60,40,40,5000); //E
+  lungs = new Organ(83,280,250,40,40,5000); //S
+  veins = new Organ(70,350,280,40,40,5000); //F
+  skin = new Organ(78,50,450,40,40,5000); //N
+  heart = new Organ(77,235,330,40,40,5000); //M
+  intestines = new Organ(75,225,440,40,40,5000); //K
+  muscle = new Organ(66,90,260,40,40,5000); //B
 }
 
 
@@ -125,14 +141,12 @@ function draw() {
 
   //Colore di sfondo a seconda della profondità.
 
-
-  //provvisoriamente il mouse indica le dimensioni del box. Per testing.
-  mainRSide = mouseX;
-
-  //sfondo del box.
+  //Sfondo del box.
   fill(0);
   stroke(255);
   rect(mainLSide, padding, mainRSide - mainLSide, height - padding * 2);
+
+  rect(mainRSide - mainLSide + padding * 3, padding, sidePanelWidth, height - padding * 2);
 
   //posizione dell'avatar
   center = createVector(mainLSide + (mainRSide - mainLSide) / 2, height / 2 + avatarOff);
@@ -300,6 +314,27 @@ function draw() {
   rect(padding,padding,meterWidth,height-padding*2);
 
   //*** INDICATORE SINTOMI***//
+  var imageX = mainRSide - mainLSide + padding * 3;
+  var imageY = height - padding - sidePanelWidth*outline.height/outline.width;
+  var imageHeight = sidePanelWidth*outline.height/outline.width;
+  image(outline,imageX, imageY, sidePanelWidth, imageHeight);
+  image(brainImage,imageX, imageY, sidePanelWidth, imageHeight);
+  image(lungsImage,imageX, imageY, sidePanelWidth, imageHeight);
+  image(veinsImage,imageX, imageY, sidePanelWidth, imageHeight);
+  image(skinImage,imageX, imageY, sidePanelWidth, imageHeight);
+  image(heartImage,imageX, imageY, sidePanelWidth, imageHeight);
+  image(intestinesImage,imageX, imageY, sidePanelWidth, imageHeight);
+  image(muscleImage,imageX, imageY, sidePanelWidth, imageHeight);
+  brain.display();
+  lungs.display();
+  veins.display();
+  skin.display();
+  heart.display();
+  intestines.display();
+  muscle.display();
+
+  strokeWeight(1);
+  textSize(20);
 
   //***AMBIENT SOUNDS***//
   let enableSound=true;

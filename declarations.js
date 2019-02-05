@@ -19,7 +19,8 @@ let shape, mask, img;
 let meterWidth=25;
 const padding = 40;
 let mainLSide = meterWidth+padding+padding*.75;
-let mainRSide = 900; // * Mappato su MouseX nel draw
+let mainRSide = 750;
+let sidePanelWidth = 450;
 
 //Variabili per il noise che uso per variare certe trasformazioni.
 var hNoise, vNoise;
@@ -64,6 +65,25 @@ let topPostPro=0;
 
 //for red post-processing near fail areas.
 let failApproach=0;
+
+// Organs image
+var outline;
+var brainImage;
+var lungsImage;
+var veinsImage;
+var skinImage;
+var heartImage;
+var intestinesImage;
+var muscleImage;
+
+// Organ objects
+var brain;
+var lungs;
+var veins;
+var skin;
+var heart;
+var intestines;
+var muscle;
 
 function bottomFailArea() {
   let img = createImage(66, 66);
@@ -257,5 +277,78 @@ function keyPressed() {
     speed += offsetJump;
   }
   then = now;
+  }
+}
+
+// ORGANO
+
+// Keycode of corresponding letter, x, y, width and height from left and top of image, time of treatment in milliseconds
+function Organ(_keyCode,_xFromSide,_yFromTop,_width,_height,_treatmentTime) {
+
+  // Hardcoded properties
+  this.symptomStage = 0;
+  this.startOfTreatment;
+  this.treatmentStage = 0;
+
+
+  // Methods
+  this.display = function() {
+
+    x = _xFromSide - _width/2 + mainRSide - mainLSide + padding * 3;
+    y = height - padding - sidePanelWidth*outline.height/outline.width + _yFromTop;
+
+    // Rectangle
+    fill(0);
+    strokeWeight(1);
+    stroke(255);
+    rect(x,y,_width,_height);
+
+    // Text
+    textFont("Noto Serif");
+    textAlign(CENTER);
+    textSize(Math.round(_width * 0.7));
+    textStyle(BOLD);
+    fill(255);
+    noStroke();
+    text(String.fromCharCode(_keyCode), x+(_width/2), y+(_height/2)+2);
+
+    if (keyIsDown(_keyCode)) {
+      if (this.startOfTreatment == null) {
+        this.startOfTreatment = millis();
+      }
+      stroke(255);
+      strokeWeight(5);
+      var quarterTreatmentProgress = (millis()-this.startOfTreatment)/(_treatmentTime/4);
+      if (this.treatmentStage == 0) {
+        line(x,y+_height,x,y+_height-_height*quarterTreatmentProgress);
+        if (quarterTreatmentProgress >= 1) {
+          this.treatmentStage = 1;
+        }
+      } else if (this.treatmentStage == 1) {
+        line(x,y+_height,x,y);
+        line(x,y,x+_width*(quarterTreatmentProgress-1),y);
+        if (quarterTreatmentProgress >= 2) {
+          this.treatmentStage = 2;
+        }
+      } else if (this.treatmentStage == 2) {
+        line(x,y+_height,x,y);
+        line(x,y,x+_width,y);
+        line(x+_width,y,x+_width,y+_height*(quarterTreatmentProgress-2));
+        if (quarterTreatmentProgress >= 3) {
+          this.treatmentStage = 3;
+        }
+      } else if (this.treatmentStage == 3) {
+        line(x,y+_height,x,y);
+        line(x,y,x+_width,y);
+        line(x+_width,y,x+_width,y+_height);
+        line(x+_width,y+_height,x+_width-_width*(quarterTreatmentProgress-3),y+_height);
+        if (quarterTreatmentProgress >= 4) {
+          this.treatmentStage = null;
+        }
+      }
+    } else {
+      this.treatmentStage = 0;
+      this.startOfTreatment = null;
+    }
   }
 }
