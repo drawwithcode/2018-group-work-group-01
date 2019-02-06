@@ -397,7 +397,7 @@ function Organ(_keyCode, _xPos, _yPos, _width, _height, _symptoms, _xPosText, _y
       push();
       textAlign(LEFT, TOP);
       fill(bgBrightness);
-      rect(xText-6,yText-6,180,28);
+      rect(xText-6,yText-6,190,28);
       fill(255-bgBrightness);
       textStyle(NORMAL);
       switch (this.symptomStage) {
@@ -415,11 +415,11 @@ function Organ(_keyCode, _xPos, _yPos, _width, _height, _symptoms, _xPosText, _y
       stroke(255-bgBrightness);
       var angle = atan((y + _height / 2 - yText) / (x + _width / 2 - xText));
       if (angle < 0) {
-        line(xText, yText + this.symptomTextSize * 0.8,
+        line(xText-10, yText + this.symptomTextSize * 0.8,
           x + _width / 2 - this.arrowMargin * cos(angle),
           y + _height / 2 - this.arrowMargin * sin(angle));
       } else {
-        line(xText, yText + this.symptomTextSize * 0.8,
+        line(xText-10, yText + this.symptomTextSize * 0.8,
           x + _width / 2 + this.arrowMargin * cos(angle),
           y + _height / 2 + this.arrowMargin * sin(angle));
       }
@@ -677,13 +677,7 @@ function failScreen() {
     line(windowWidth / 2 - 105, windowHeight / 2 + 75, windowWidth / 2 + 105, windowHeight / 2 + 75)
     if (mouseX < width / 2 + 105 && mouseX > width / 2 - 105 && mouseY < height / 2 + 80 && mouseY > height / 2 + 50) {
       cursor('pointer');
-      if (mouseIsPressed && canPressMouse) {
-        storySlide = 1;
-        gameState = -1;
-        playerDied=0;
-        canPressMouse = 0;
-        cursor('auto');
-      }
+
     } else {
       cursor('auto');
     }
