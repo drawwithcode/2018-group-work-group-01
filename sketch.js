@@ -24,6 +24,13 @@ function preload() {
   heartImage = loadImage("./images/heart.png");
   intestinesImage = loadImage("./images/intestines.png");
   muscleImage = loadImage("./images/muscle.png");
+  invertedBrainImage = loadImage("./images/inverted-brain.png");
+  invertedLungsImage = loadImage("./images/inverted-lungs.png");
+  invertedVeinsImage = loadImage("./images/inverted-veins.png");
+  invertedSkinImage = loadImage("./images/inverted-skin.png");
+  invertedHeartImage = loadImage("./images/inverted-heart.png");
+  invertedIntestinesImage = loadImage("./images/inverted-intestines.png");
+  invertedMuscleImage = loadImage("./images/inverted-muscle.png");
 }
 
 
@@ -55,13 +62,13 @@ function setup() {
   //organs
 
   //_keyCode,_xFromSide,_yFromTop,_width,_height,_symptoms,_xFromSideText_yFromTopText,_treatmentTime
-  brain = new Organ(89,0.5,0.15,40,40,brainSymptoms,0.55,0.2,5000); //E
-  lungs = new Organ(71,0.41,0.5,40,40,lungsSymptoms,.46,.55,5000); //S
-  veins = new Organ(75,0.8,0.5,40,40,veinsSymptoms,.85,.55,5000); //F
-  skin = new Organ(90,0.15,0.8,40,40,skinSymptoms,.2,.85,5000); //N
-  heart = new Organ(72,0.5,0.61,40,40,heartSymptoms,.55,.66,5000); //M
-  intestines = new Organ(66,0.5,0.75,40,40,intestinesSymptoms,.55,.8,5000); //K
-  muscle = new Organ(65,0.15,0.5,40,40,muscleSymptoms,.2,.55,5000); //B
+  brain = new Organ(89,0.5,0.15,40,40,brainSymptoms,0.55,0.2,1000); //E
+  lungs = new Organ(71,0.41,0.5,40,40,lungsSymptoms,.46,.55,1000); //S
+  veins = new Organ(75,0.8,0.5,40,40,veinsSymptoms,.85,.55,1000); //F
+  skin = new Organ(90,0.15,0.8,40,40,skinSymptoms,.2,.85,1000); //N
+  heart = new Organ(72,0.5,0.61,40,40,heartSymptoms,.55,.66,1000); //M
+  intestines = new Organ(66,0.5,0.75,40,40,intestinesSymptoms,.55,.8,1000); //K
+  muscle = new Organ(65,0.15,0.5,40,40,muscleSymptoms,.2,.55,1000); //B
   organs.push(brain,lungs,veins,skin,heart,intestines,muscle);
 
   setTimeout(function() {
@@ -413,13 +420,44 @@ function draw() {
   var imageY = height - padding - sidePanelWidth*outline.height/outline.width;
   var imageHeight = sidePanelWidth*outline.height/outline.width;
   image(outline,imageX, imageY, sidePanelWidth, imageHeight);
-  image(brainImage,imageX, imageY, sidePanelWidth, imageHeight);
-  image(lungsImage,imageX, imageY, sidePanelWidth, imageHeight);
-  image(veinsImage,imageX, imageY, sidePanelWidth, imageHeight);
-  image(skinImage,imageX, imageY, sidePanelWidth, imageHeight);
-  image(heartImage,imageX, imageY, sidePanelWidth, imageHeight);
-  image(intestinesImage,imageX, imageY, sidePanelWidth, imageHeight);
-  image(muscleImage,imageX, imageY, sidePanelWidth, imageHeight);
+
+  // I deeply apologize
+  if (brain.symptomStage != brain.treatedSymptomsStage) {
+    image(invertedBrainImage,imageX, imageY, sidePanelWidth, imageHeight);
+  } else {
+    image(brainImage,imageX, imageY, sidePanelWidth, imageHeight);
+  }
+  if (lungs.symptomStage != lungs.treatedSymptomsStage) {
+    image(invertedLungsImage,imageX, imageY, sidePanelWidth, imageHeight);
+  } else {
+    image(lungsImage,imageX, imageY, sidePanelWidth, imageHeight);
+  }
+  if (veins.symptomStage != veins.treatedSymptomsStage) {
+    image(invertedVeinsImage,imageX, imageY, sidePanelWidth, imageHeight);
+  } else {
+    image(veinsImage,imageX, imageY, sidePanelWidth, imageHeight);
+  }
+  if (skin.symptomStage != skin.treatedSymptomsStage) {
+    image(invertedSkinImage,imageX, imageY, sidePanelWidth, imageHeight);
+  } else {
+    image(skinImage,imageX, imageY, sidePanelWidth, imageHeight);
+  }
+  if (heart.symptomStage != heart.treatedSymptomsStage) {
+    image(invertedHeartImage,imageX, imageY, sidePanelWidth, imageHeight);
+  } else {
+    image(heartImage,imageX, imageY, sidePanelWidth, imageHeight);
+  }
+  if (intestines.symptomStage != intestines.treatedSymptomsStage) {
+    image(invertedIntestinesImage,imageX, imageY, sidePanelWidth, imageHeight);
+  } else {
+    image(intestinesImage,imageX, imageY, sidePanelWidth, imageHeight);
+  }
+  if (muscle.symptomStage != muscle.treatedSymptomsStage) {
+    image(invertedMuscleImage,imageX, imageY, sidePanelWidth, imageHeight);
+  } else {
+    image(muscleImage,imageX, imageY, sidePanelWidth, imageHeight);
+  }
+
   for (var i = 0; i < organs.length; i++) {
     organs[i].display();
   }
