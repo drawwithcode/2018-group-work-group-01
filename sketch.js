@@ -73,6 +73,10 @@ function setup() {
 }
 
 function startTurkey() {
+  if (turkey == true) {
+    return;
+  }
+  turkey = true;
   for (var i = 0; i < organs.length; i++) {
     organs[i].symptomStage = 0;
     organs[i].treatedSymptomsStage = 0;
@@ -83,6 +87,15 @@ function startTurkey() {
     }
     stateChecker = setInterval(increaseLevel, 2000);
   }, 2000);
+}
+
+function endGame() {
+  for (var i = 0; i < organs.length; i++) {
+    organs[i].symptomStage = 0;
+    organs[i].treatedSymptomsStage = 0;
+  }
+  clearInterval(stateChecker);
+  turkey = false;
 }
 
 function increaseLevel() {
@@ -104,7 +117,7 @@ function increaseLevel() {
       } else {
         storySlide=7;
         gameState=0;
-        clearInterval(stateChecker);
+        endGame();
       }
     }
   }
@@ -138,12 +151,12 @@ function draw() {
     meterPos=lerp(meterPos,0,0.02);
     mainLSide=lerp(mainLSide, padding+meterWidth+padding*.75,0.02);
     sidePanelPos=width+padding;
-    if (jumpAmount<10) {
+    if (jumpAmount<15) {
       gameState=2;
-      startTurkey();
     }
   }
   if (gameState==2) {
+    startTurkey();
     meterPos=lerp(meterPos,0,0.02);
     mainLSide=lerp(mainLSide, padding+meterWidth+padding*.75,0.02);
     mainRSide=lerp(mainRSide,width-padding*1.75-sidePanelWidth,0.02);
@@ -158,6 +171,7 @@ function draw() {
     topMeterIncrease=138;
   }
   if((height-center.y)>(26150-topFailIncrease)-vOffset||(height-center.y)<-(26300)-vOffset) {
+    endGame();
     gameState=0;
     playerDied=1;
     if(inception.isPlaying()==false) {

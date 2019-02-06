@@ -1,6 +1,7 @@
 //GAME STATE. -1=Title screen; 0=Game paused; 1= game started (phase 1); 2= phase 2; 3 = phase 3.
 let gameState = -1;
 var stateChecker;
+var turkey = false;
 
 //audio vars.
 let enableSound = 0;
@@ -372,28 +373,28 @@ function Organ(_keyCode, _xPos, _yPos, _width, _height, _symptoms, _xPosText, _y
     xText = mainRSide+padding*.75+ _xPosText*sidePanelWidth;
     yText = padding + _yPosText*(height-padding*2);
 
-    // Rectangle
-    blendMode(BLEND);
-    strokeWeight(10);
-    stroke(bgBrightness);
-    fill(bgBrightness);
-    rect(x, y, _width, _height);
-    fill(bgBrightness);
-    strokeWeight(1);
-    stroke(255-bgBrightness);
-    rect(x, y, _width, _height);
-
-    // Letter
-    textFont("Noto Serif");
-    textAlign(CENTER);
-    textSize(Math.round(_width * 0.7));
-    textStyle(BOLD);
-    fill(255-bgBrightness);
-    noStroke();
-    text(String.fromCharCode(_keyCode), x+_width/2, y+_height/1.3);
-
     // Symptom Text
     if (this.symptomStage != this.treatedSymptomsStage) {
+      // Rectangle
+      blendMode(BLEND);
+      strokeWeight(10);
+      stroke(bgBrightness);
+      fill(bgBrightness);
+      rect(x, y, _width, _height);
+      fill(bgBrightness);
+      strokeWeight(1);
+      stroke(255-bgBrightness);
+      rect(x, y, _width, _height);
+
+      // Letter
+      textFont("Noto Serif");
+      textAlign(CENTER);
+      textSize(Math.round(_width * 0.7));
+      textStyle(BOLD);
+      fill(255-bgBrightness);
+      noStroke();
+      text(String.fromCharCode(_keyCode), x+_width/2, y+_height/1.3);
+
       blendMode(DIFFERENCE);
       textSize(this.symptomTextSize);
       textStyle(BOLD);
