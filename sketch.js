@@ -70,7 +70,13 @@ function setup() {
   intestines = new Organ(66,0.5,0.75,40,40,intestinesSymptoms,.55,.8,1000); //K
   muscle = new Organ(65,0.15,0.5,40,40,muscleSymptoms,.2,.55,1000); //B
   organs.push(brain,lungs,veins,skin,heart,intestines,muscle);
+}
 
+function startTurkey() {
+  for (var i = 0; i < organs.length; i++) {
+    organs[i].symptomStage = 0;
+    organs[i].treatedSymptomsStage = 0;
+  }
   setTimeout(function() {
     for (var i = 0; i < organs.length; i++) {
       setSymptom(organs[i], 1, int(random(0, 7000)));
@@ -130,6 +136,7 @@ function draw() {
     sidePanelPos=width+padding;
     if (jumpAmount<2) {
       gameState=2;
+      startTurkey();
     }
   }
   if (gameState==2) {
