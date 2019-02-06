@@ -107,7 +107,7 @@ var skinSymptoms = {
   "three": "Tremors"
 }
 var heartSymptoms = {
-  "three": "Rapid hearth rate"
+  "three": "Rapid heart rate"
 }
 var intestinesSymptoms = {
   "one": "Nausea and cramps",
