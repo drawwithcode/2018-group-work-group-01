@@ -31,6 +31,7 @@ We hereby present some of the most noteworthy features of our project.
 To provide context and immerse the player in the experience, we use a short story requiring a minimum of interactivity to present a possible scenario where drug addiction can start. This story reaches its conclusion in one of the three possible endings the player can reach, two of which result from failure to complete the experience.<br>
 This format is a simplified version of a [Twine](http://twinery.org/) story.
 #### Multiple tiling windows
+![Multiple tiles](readme/multiple-tiles.gif)<br>
 The screen is, at any moment, divided in up to three windows.
 The central window is the most important: it offers a vertically scrolling view of the player's depth, in a sort of a zoomed-in state.<br>
 The left window is a height meter which shows the player's total depth compared to the world.
