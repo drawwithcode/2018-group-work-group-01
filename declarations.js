@@ -1,6 +1,6 @@
 //GAME STATE. -1=Title screen; 0=Game paused; 1= game started (phase 1); 2= phase 2; 3 = phase 3.
 let gameState = -1;
-
+var stateChecker;
 
 //audio vars.
 let enableSound = 0;
