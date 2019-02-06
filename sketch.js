@@ -68,7 +68,7 @@ function setup() {
   skin = new Organ(90,0.15,0.8,40,40,skinSymptoms,.2,.85,1000); //N
   heart = new Organ(72,0.5,0.61,40,40,heartSymptoms,.55,.66,1000); //M
   intestines = new Organ(66,0.5,0.75,40,40,intestinesSymptoms,.55,.8,1000); //K
-  muscle = new Organ(65,0.15,0.5,40,40,muscleSymptoms,.2,.55,1000); //B
+  muscle = new Organ(65,0.15,0.5,40,40,muscleSymptoms,.16,.60,1000); //B
   organs.push(brain,lungs,veins,skin,heart,intestines,muscle);
 }
 
@@ -101,6 +101,9 @@ function increaseLevel() {
     for (var i = 0; i < organs.length; i++) {
       if (currentLevel + 1 < 4) {
         setSymptom(organs[i], currentLevel + 1, int(random(0, 7000)));
+      } else {
+        storySlide=7;
+        gameState=0;
       }
     }
   }
@@ -121,7 +124,7 @@ function draw() {
     center.y=height/2;
     enableSound=0;
     sidePanelPos=width+padding;
-    if (keyIsDown(32)&&canPressSpace) {
+    if (keyIsDown(32)&&canPressSpace&&gameState==0&&storySlide==4) {
       canPressSpace=0;
       gameState=1;
       speed+=jumpAmount;
@@ -561,6 +564,7 @@ function draw() {
 }
 
   //***TITLE SCREEN***//
+
   if(gameState==-1) {
     mapVar=2;
     title=new titleScreen();
@@ -629,6 +633,7 @@ function draw() {
   if (gameState==0) {
     fail.partTwo();
   }
+
 }
 
 function windowResized() {
