@@ -81,7 +81,7 @@ function startTurkey() {
     for (var i = 0; i < organs.length; i++) {
       setSymptom(organs[i], 1, int(random(0, 7000)));
     }
-    setInterval(increaseLevel, 2000);
+    stateChecker = setInterval(increaseLevel, 2000);
   }, 2000);
 }
 
@@ -104,6 +104,7 @@ function increaseLevel() {
       } else {
         storySlide=7;
         gameState=0;
+        clearInterval(stateChecker);
       }
     }
   }
