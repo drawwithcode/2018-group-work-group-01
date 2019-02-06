@@ -316,7 +316,7 @@ function keyPressed() {
   timesJumped++;
   if (keyCode === 32) {
     if (jumpAmount > 0.7) {
-      jumpAmount *= 0.85;
+      jumpAmount *= 0.87;
     }
     let offsetJump = jumpAmount;
     if (vOffset < 200) {
@@ -374,6 +374,10 @@ function Organ(_keyCode, _xPos, _yPos, _width, _height, _symptoms, _xPosText, _y
 
     // Rectangle
     blendMode(BLEND);
+    strokeWeight(10);
+    stroke(bgBrightness);
+    fill(bgBrightness);
+    rect(x, y, _width, _height);
     fill(bgBrightness);
     strokeWeight(1);
     stroke(255-bgBrightness);
@@ -412,7 +416,8 @@ function Organ(_keyCode, _xPos, _yPos, _width, _height, _symptoms, _xPosText, _y
       }
       pop();
       stroke(1);
-      stroke(255-bgBrightness);
+      stroke(bgBrightness);
+      blendMode(DIFFERENCE);
       var angle = atan((y + _height / 2 - yText) / (x + _width / 2 - xText));
       if (angle < 0) {
         line(xText-10, yText + this.symptomTextSize * 0.8,
@@ -433,6 +438,7 @@ function Organ(_keyCode, _xPos, _yPos, _width, _height, _symptoms, _xPosText, _y
       if (this.startOfTreatment == null) {
         this.startOfTreatment = millis();
       }
+      blendMode(BLEND);
       stroke(255-bgBrightness);
       strokeWeight(5);
       var quarterTreatmentProgress = (millis() - this.startOfTreatment) / (_treatmentTime / 4);
@@ -680,12 +686,11 @@ function failScreen() {
     if (mouseX < width / 2 + 105 && mouseX > width / 2 - 105 && mouseY < height / 2 + 80 && mouseY > height / 2 + 50) {
       cursor('pointer');
       if (mouseIsPressed && canPressMouse) {
-        //storySlide = 1;
-        //gameState = -1;
+        storySlide = 1;
+        gameState = -1;
         playerDied=0;
         canPressMouse = 0;
         cursor('auto');
-        gameOver=1;
       }
     } else {
       cursor('auto');
@@ -741,9 +746,4 @@ let canPressMouse = 1;
 
 function mouseReleased() {
   canPressMouse = 1;
-  if (gameOver==1) {
-    gameState=-1;
-    storySlide=7;
-    gameOver=0;
-  }
 }

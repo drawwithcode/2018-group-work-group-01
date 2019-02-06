@@ -100,7 +100,7 @@ function increaseLevel() {
   if (curedOrgans == organs.length) {
     for (var i = 0; i < organs.length; i++) {
       if (currentLevel + 1 < 4) {
-        setSymptom(organs[i], currentLevel + 1, int(random(0, 7000)));
+        setSymptom(organs[i], currentLevel + 1, int(random(0, 7000)))
       } else {
         storySlide=7;
         gameState=0;
@@ -137,7 +137,7 @@ function draw() {
     meterPos=lerp(meterPos,0,0.02);
     mainLSide=lerp(mainLSide, padding+meterWidth+padding*.75,0.02);
     sidePanelPos=width+padding;
-    if (jumpAmount<2) {
+    if (jumpAmount<4) {
       gameState=2;
       startTurkey();
     }
