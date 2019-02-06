@@ -138,7 +138,7 @@ function draw() {
     meterPos=lerp(meterPos,0,0.02);
     mainLSide=lerp(mainLSide, padding+meterWidth+padding*.75,0.02);
     sidePanelPos=width+padding;
-    if (jumpAmount<4) {
+    if (jumpAmount<10) {
       gameState=2;
       startTurkey();
     }
