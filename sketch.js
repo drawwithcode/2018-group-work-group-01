@@ -62,23 +62,13 @@ function setup() {
   //organs
 
   //_keyCode,_xFromSide,_yFromTop,_width,_height,_symptoms,_xFromSideText_yFromTopText,_treatmentTime
-<<<<<<< HEAD
-  brain = new Organ(89,0.5,0.15,40,40,brainSymptoms,0.55,0.2,5000); //E
-  lungs = new Organ(71,0.41,0.5,40,40,lungsSymptoms,.46,.55,5000); //S
-  veins = new Organ(75,0.8,0.5,40,40,veinsSymptoms,.85,.55,5000); //F
-  skin = new Organ(90,0.15,0.8,40,40,skinSymptoms,.2,.85,5000); //N
-  heart = new Organ(72,0.5,0.61,40,40,heartSymptoms,.55,.66,5000); //M
-  intestines = new Organ(66,0.5,0.75,40,40,intestinesSymptoms,.55,.8,5000); //K
-  muscle = new Organ(65,0.15,0.5,40,40,muscleSymptoms,.16,.60,5000); //B
-=======
   brain = new Organ(89,0.5,0.15,40,40,brainSymptoms,0.55,0.2,1000); //E
   lungs = new Organ(71,0.41,0.5,40,40,lungsSymptoms,.46,.55,1000); //S
   veins = new Organ(75,0.8,0.5,40,40,veinsSymptoms,.85,.55,1000); //F
   skin = new Organ(90,0.15,0.8,40,40,skinSymptoms,.2,.85,1000); //N
   heart = new Organ(72,0.5,0.61,40,40,heartSymptoms,.55,.66,1000); //M
   intestines = new Organ(66,0.5,0.75,40,40,intestinesSymptoms,.55,.8,1000); //K
-  muscle = new Organ(65,0.15,0.5,40,40,muscleSymptoms,.2,.55,1000); //B
->>>>>>> 1a32a8cda95a649ad96c71e1b51d922074e08cb7
+  muscle = new Organ(65,0.15,0.5,40,40,muscleSymptoms,.16,.60,1000); //B
   organs.push(brain,lungs,veins,skin,heart,intestines,muscle);
 
   setTimeout(function() {
@@ -636,12 +626,7 @@ function draw() {
   if (gameState==0) {
     fail.partTwo();
   }
-  if (gameState==0&&storySlide==7&&mouseIsPressed&&canPressMouse) {
-    storySlide = 1;
-    gameState = -1;
-    playerDied=0;
-    canPressMouse=0;
-  }
+
 }
 
 function windowResized() {
